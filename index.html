@@ -179,6 +179,8 @@ svg{display:block;flex:none}
 .n-head h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.5px}
 .compose{color:var(--accent)}
 #page-notes.split .n-head{display:none}
+#page-notes.vault-mode .n-head-row{display:none}
+#page-notes.vault-mode .n-head{padding-top:8px;padding-bottom:8px}
 .seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg2);border-radius:9px;padding:2px}
 .seg button{height:30px;font-size:13px;font-weight:600;border-radius:7px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(var(--shade),.16)}
@@ -318,6 +320,56 @@ input.v-title::placeholder,.v-edit textarea::placeholder{color:var(--v-muted)}
 .v-menu .on{color:var(--v-acc)}
 .v-menu hr{border:0;border-top:1px solid var(--v-line);margin:4px 0}
 .v-menu .v-inp{margin:4px 0}
+
+/* ---------- VAULT PANES ---------- */
+.v-strip{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.v-strip::-webkit-scrollbar{display:none}
+.vp{container-type:inline-size;display:flex;flex-direction:column;min-width:0;height:100%;scroll-snap-align:start;border-right:1px solid var(--v-line);position:relative;background:var(--v-bg)}
+.vp:last-child{border-right:0}
+.vp-files{flex:.8 1 0;min-width:118px;background:var(--v-side)}
+.vp-note{flex:1.5 1 0;min-width:150px}
+.vp-graph{flex:1 1 0;min-width:118px}
+.vp-tabs{flex:none;display:flex;align-items:flex-end;gap:2px;padding:6px 4px 0;background:rgba(0,0,0,.2);height:42px}
+.vp-tab{flex:1;min-width:0;display:flex;align-items:center;gap:5px;height:36px;padding:0 3px 0 9px;border-radius:9px 9px 0 0;background:var(--v-bg);color:var(--v-ink);font-size:13px;font-weight:500}
+.vp-files .vp-tab{background:var(--v-side)}
+.vp.act .vp-tab{box-shadow:inset 0 2px 0 var(--v-acc)}
+.vp-ic{color:var(--v-muted);display:grid;flex:none}
+.vp-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vp-x{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;color:var(--v-muted);flex:none}
+.vp-x:active,.vp-plus:active{background:var(--v-hover)}
+.vp-plus{width:32px;height:32px;margin-bottom:2px;border-radius:8px;display:grid;place-items:center;color:var(--v-muted);flex:none}
+.vp-tools{flex:none;display:flex;align-items:center;padding:4px;min-height:42px}
+.vp-tools .icon-btn{width:34px;height:34px;border-radius:8px;color:var(--v-muted)}
+.vp-tools .icon-btn:active{background:var(--v-hover)}
+.vp-tools .icon-btn.on{background:rgba(236,230,214,.11);color:var(--v-ink)}
+.vp-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative}
+.vp-note .vp-body{padding:2px 18px calc(var(--nav-h) + var(--safe-b) + 40px);-webkit-user-select:text;user-select:text}
+.vp-files .vp-body{padding:2px 6px calc(var(--nav-h) + var(--safe-b) + 30px)}
+.vp-graph .vp-body{overflow:hidden;touch-action:none}
+.vp-graph canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.v-row.file.root{padding-left:12px}
+@container (max-width:260px){
+  .vp-note .vp-body{padding:2px 10px calc(var(--nav-h) + var(--safe-b) + 40px)}
+  .v-title{font-size:19px;margin:2px 0 10px}
+  .md{font-size:13.5px;line-height:1.5}
+  .md .cb{width:15px;height:15px;margin-top:2px}
+  .v-edit textarea{font-size:12.5px}
+  .v-row{font-size:13px;padding:6px;min-height:32px}
+  .v-row.file{padding-left:22px}.v-row.file.nested{padding-left:28px}.v-row.file.root{padding-left:8px}
+  .v-bl{padding:7px 8px}.v-bl b{font-size:12.5px}.v-bl span{font-size:11.5px}
+  .v-path,.v-status{font-size:11px}
+  .v-res b{font-size:13px}.v-res span{font-size:11.5px}
+  .vp-tools .icon-btn{width:28px;height:28px}
+  .vp-tab{font-size:12px;padding-left:7px;gap:3px}
+}
+.v-none{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;width:100%;color:var(--v-muted);font-size:15px;padding:20px}
+.v-none-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.v-none-btns button,.v-add button{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:10px;background:rgba(236,230,214,.08);color:var(--v-ink);font-size:15px}
+.v-add{position:absolute;z-index:8;background:#21392d;border:1px solid var(--v-line);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:2px;box-shadow:0 14px 34px rgba(0,0,0,.4);width:210px}
+.v-add button{background:none;width:100%}
+.v-add button:active{background:var(--v-hover)}
+.v-add button svg{color:var(--v-muted)}
+.v-menu{left:auto}
 
 .editor{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--card);z-index:12;display:flex;flex-direction:column;
   transform:translateX(100%);transition:transform .34s cubic-bezier(.3,.7,.2,1)}
@@ -485,30 +537,9 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
       </div>
     </div>
     <div class="vault" id="vault" hidden>
-      <div class="v-bar">
-        <button class="icon-btn v-round" id="vSideBtn" aria-label="Sivupalkki"></button>
-        <button class="icon-btn" id="vBackBtn" aria-label="Takaisin" hidden></button>
-        <span class="v-sp"></span>
-        <div class="v-pill">
-          <button class="icon-btn" id="vModeBtn" aria-label="Luku- tai muokkaustila"></button>
-          <button class="icon-btn" id="vMoreBtn" aria-label="Lisää toimintoja"></button>
-        </div>
-      </div>
-      <div class="v-scroll" id="vScroll"></div>
-      <div class="v-dim" id="vDim"></div>
-      <aside class="v-side" id="vSide">
-        <div class="v-side-top">
-          <button class="icon-btn on" data-vtab="files" aria-label="Tiedostot"></button>
-          <button class="icon-btn" data-vtab="search" aria-label="Haku"></button>
-          <button class="icon-btn" data-vtab="tags" aria-label="Tunnisteet"></button>
-          <span class="v-sp"></span>
-          <button class="icon-btn" id="vNewNote" aria-label="Uusi muistio"></button>
-          <button class="icon-btn" id="vNewFolder" aria-label="Uusi kansio"></button>
-        </div>
-        <div class="v-tree" id="vTree"></div>
-        <div class="v-foot"><span>Holvi</span><span id="vCount"></span></div>
-      </aside>
+      <div class="v-strip" id="vStrip"></div>
       <div class="v-menu" id="vMenu"></div>
+      <div class="v-add" id="vAdd" hidden></div>
     </div>
   </div>
   <div class="editor" id="editor">
@@ -556,7 +587,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.5</p>
+    <p class="hint" style="margin-top:24px">Versio 0.6</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -621,6 +652,7 @@ const I={
   tag:'<path d="M3.5 12.5V5a1.5 1.5 0 0 1 1.5-1.5h7.5l8 8-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
   graph:'<circle cx="6" cy="6" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="9" cy="18" r="2"/><path d="M8 6.3 16 7.7M6.6 8 8.4 16M10.4 16.6 16.7 9.6"/>',
   check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
   sparkle:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'
 };
 const svg=(k,s=22,w=1.8)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
@@ -1087,6 +1119,7 @@ function setNotesMode(m){
   notesMode=m;
   [['list','segList'],['map','segMap'],['graph','segGraph'],['vault','segVault']].forEach(([k,i])=>$(i).classList.toggle('on',m===k));
   closeSide();closeMenu();
+  nPage.classList.toggle('vault-mode',m==='vault');
   $('nListWrap').hidden=m!=='list';mapEl.hidden=m!=='map';graphEl.hidden=m!=='graph';vaultEl.hidden=m!=='vault';
   if(m==='map'){renderMap();requestAnimationFrame(()=>fitMap(false))}
   else if(m==='graph'){requestAnimationFrame(()=>{sizeCanvas();rebuildGraph(true);fitGraph(false)})}
@@ -1322,23 +1355,23 @@ function tick(){
     n.vx-=n.x*.012*alpha;n.vy-=n.y*.012*alpha;n.vx*=.62;n.vy*=.62;n.x+=n.vx;n.y+=n.vy}
   alpha*=.985;
 }
-function kick(a){alpha=Math.max(alpha,a);if(!gRaf&&!graphEl.hidden)gRaf=requestAnimationFrame(loop)}
-function loop(){gRaf=null;if(graphEl.hidden)return;tick();drawGraph();if(alpha>.015||gDrag)gRaf=requestAnimationFrame(loop)}
+function kick(a){alpha=Math.max(alpha,a);if(!gRaf&&(!graphEl.hidden||vaultGraphsVisible()))gRaf=requestAnimationFrame(loop)}
+function loop(){gRaf=null;if(graphEl.hidden&&!vaultGraphsVisible())return;tick();drawGraph();if(alpha>.015||gDrag)gRaf=requestAnimationFrame(loop)}
 function gNeighbors(id){const s=new Set([id]);for(const [a,b] of gEdges){if(a===id)s.add(b);if(b===id)s.add(a)}return s}
-function drawGraph(){
-  if(graphEl.hidden||!gCanvas.width)return;
-  const ctx=gCanvas.getContext('2d'),d=devicePixelRatio||1,W=gCanvas.width/d,H=gCanvas.height/d,k=gView.k;
+function drawGraphTo(cv,view,sel){
+  if(!cv||!cv.width||!view)return;
+  const ctx=cv.getContext('2d'),d=devicePixelRatio||1,W=cv.width/d,H=cv.height/d,k=view.k;
   ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,W,H);
-  const nb=gSel&&gNodes.has(gSel)?gNeighbors(gSel):null;
-  ctx.setTransform(d*k,0,0,d*k,d*gView.x,d*gView.y);
-  for(const [a,b,w] of gEdges){const A=gNodes.get(a),B=gNodes.get(b),hi=nb&&(a===gSel||b===gSel);
+  const nb=sel&&gNodes.has(sel)?gNeighbors(sel):null;
+  ctx.setTransform(d*k,0,0,d*k,d*view.x,d*view.y);
+  for(const [a,b,w] of gEdges){const A=gNodes.get(a),B=gNodes.get(b),hi=nb&&(a===sel||b===sel);
     ctx.strokeStyle=hi?'rgba(127,209,154,.85)':nb?'rgba(233,228,216,.08)':'rgba(233,228,216,.26)';
     ctx.lineWidth=(hi?1.8:1.1)/k;ctx.setLineDash(w?[4/k,4/k]:[]);
     ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke()}
   ctx.setLineDash([]);
   for(const n of gNodes.values()){const dim=nb&&!nb.has(n.id);ctx.globalAlpha=dim?.22:1;
-    const r=gRadius(n.id);ctx.fillStyle=n.id===gSel?'#ffffff':gColor(n.id);
-    ctx.beginPath();ctx.arc(n.x,n.y,n.id===gSel?r+1.5:r,0,Math.PI*2);ctx.fill()}
+    const r=gRadius(n.id);ctx.fillStyle=n.id===sel?'#ffffff':gColor(n.id);
+    ctx.beginPath();ctx.arc(n.x,n.y,n.id===sel?r+1.5:r,0,Math.PI*2);ctx.fill()}
   ctx.globalAlpha=1;ctx.setTransform(d,0,0,d,0,0);
   ctx.font='500 11.5px -apple-system,BlinkMacSystemFont,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
   const maxDeg=Math.max(1,...gDeg.values());
@@ -1346,10 +1379,11 @@ function drawGraph(){
     const show=k>.9||(nb&&nb.has(n.id))||(gDeg.get(n.id)||0)>=Math.max(2,maxDeg);
     if(!show)continue;const note=noteById(n.id);if(!note)continue;
     let t=noteName(note);if(t.length>24)t=t.slice(0,23)+'…';
-    const dim=nb&&!nb.has(n.id);ctx.fillStyle=dim?'rgba(240,236,226,.25)':n.id===gSel?'#ffffff':'rgba(240,236,226,.82)';
-    ctx.fillText(t,n.x*k+gView.x,n.y*k+gView.y+gRadius(n.id)*k+5);
+    const dim=nb&&!nb.has(n.id);ctx.fillStyle=dim?'rgba(240,236,226,.25)':n.id===sel?'#ffffff':'rgba(240,236,226,.82)';
+    ctx.fillText(t,n.x*k+view.x,n.y*k+view.y+gRadius(n.id)*k+5);
   }
 }
+function drawGraph(){if(!graphEl.hidden)drawGraphTo(gCanvas,gView,gSel);drawPanelGraphs()}
 function animateG(t){const s={...gView},t0=performance.now();
   const step=now=>{const e=Math.min(1,(now-t0)/380),q=1-Math.pow(1-e,3);gView={x:s.x+(t.x-s.x)*q,y:s.y+(t.y-s.y)*q,k:s.k+(t.k-s.k)*q};drawGraph();if(e<1)requestAnimationFrame(step)};
   requestAnimationFrame(step)}
@@ -1395,16 +1429,12 @@ graphEl.addEventListener('pointerup',gEnd);graphEl.addEventListener('pointercanc
 graphEl.addEventListener('wheel',e=>{e.preventDefault();const p=grel(e),k=Math.max(.2,Math.min(3,gView.k*Math.exp(-e.deltaY*.0015)));
   const wx=(p.x-gView.x)/gView.k,wy=(p.y-gView.y)/gView.k;gView={k,x:p.x-wx*k,y:p.y-wy*k};drawGraph()},{passive:false});
 
-/* ---- vault (Obsidian-style) ---- */
-const vaultEl=$('vault');
-let vaultId=null,vEdit=false,vHist=[],vTab='files',vQuery='',vAddFolder=false,vMenuMode='main',vDelArmed=false;
+/* ---- vault: Obsidian-style workspace (max 3 panes) ---- */
+const vaultEl=$('vault'),vStrip=$('vStrip');
 const vOpen=new Set(state.vaultOpenFolders||['Ideat','Projektit']);
-$('vSideBtn').innerHTML=svg('panel',20);$('vBackBtn').innerHTML=svg('left',22,2);$('vMoreBtn').innerHTML=svg('more',20);
-document.querySelector('[data-vtab=files]').innerHTML=svg('folder',20);
-document.querySelector('[data-vtab=search]').innerHTML=svg('search',20);
-document.querySelector('[data-vtab=tags]').innerHTML=svg('tag',20);
-$('vNewNote').innerHTML=svg('compose',20);$('vNewFolder').innerHTML=svg('folderPlus',20);
-
+const PANEL_MAX=3;
+const TYPE={files:{ic:'folder',name:'Kansiot'},note:{ic:'note',name:'Muistio'},graph:{ic:'graph',name:'Graafi'}};
+let vMenuCtx=null,vMenuMode='main',vDelArmed=false,needFull=false;
 function findByName(name){name=name.trim().toLowerCase();return state.notes.find(x=>noteName(x).toLowerCase()===name)}
 function mdInline(t){
   let s=esc(t);const codes=[];
@@ -1444,153 +1474,299 @@ function mdRender(body){
 function backlinksOf(id){return state.notes.filter(n=>n.id!==id&&wikiTargets(n).includes(id))}
 function snippetFor(n,id){const t=noteById(id);const name=t?noteName(t).toLowerCase():'';
   const line=(n.body||'').split('\n').find(l=>l.toLowerCase().includes('[['+name))||firstLine(n.body);return line.replace(/[#*>`=\[\]]/g,'').trim()}
-function vaultDefault(){
-  if(noteById(vaultId))return;
-  const last=noteById(state.vaultLast);
-  vaultId=last?last.id:([...state.notes].sort((a,b)=>b.updated-a.updated)[0]||{}).id||null;
-}
-function renderVault(keepScroll){
-  const sc=$('vScroll'),y=sc.scrollTop,n=noteById(vaultId);
-  $('vBackBtn').hidden=!vHist.length;
-  $('vModeBtn').innerHTML=svg(vEdit?'book':'pencil',20);
-  $('vModeBtn').setAttribute('aria-label',vEdit?'Lukutila':'Muokkaa');
-  if(!n){sc.innerHTML=`<div class="v-empty">Ei avointa muistiota.<br><button id="vEmptyNew">Luo uusi muistio</button> tai avaa sellainen sivupalkista.</div>`;
-    $('vEmptyNew').onclick=()=>vNew('');return}
-  const words=((n.body||'').match(/\S+/g)||[]).length,bl=backlinksOf(n.id);
-  const manual=state.links.filter(l=>l.includes(n.id)).map(l=>noteById(l[0]===n.id?l[1]:l[0])).filter(Boolean);
-  let h=n.folder?`<div class="v-path">${svg('folder',13)}${esc(n.folder)}</div>`:'';
-  if(vEdit){
-    h+=`<input class="v-title" id="vTitleIn" value="${esc(n.title||'')}" placeholder="Nimetön" autocomplete="off">
-      <div class="v-edit"><textarea id="vBodyIn" placeholder="Aloita kirjoittaminen…&#10;&#10;# Otsikko, - [ ] tehtävä, > lainaus, [[linkki]], #tunniste">${esc(n.body||'')}</textarea></div>`;
-  }else{
-    h+=`<div class="v-title">${esc(noteName(n))}</div><div class="md">${mdRender(n.body)||'<p class="v-muted">Tyhjä muistio. Napauta kynää kirjoittaaksesi.</p>'}</div>`;
-  }
-  if(bl.length)h+=`<div class="v-sec"><h4>Takalinkit · ${bl.length}</h4>${bl.map(b=>`<button class="v-bl" data-open="${b.id}"><b>${esc(noteName(b))}</b><span>${esc(snippetFor(b,n.id))}</span></button>`).join('')}</div>`;
-  if(manual.length)h+=`<div class="v-sec"><h4>Yhdistetty mielikartassa · ${manual.length}</h4>${manual.map(b=>`<button class="v-bl" data-open="${b.id}"><b>${esc(noteName(b))}</b><span>${esc(firstLine(b.body))}</span></button>`).join('')}</div>`;
-  h+=`<div class="v-status">${bl.length} ${bl.length===1?'takalinkki':'takalinkkiä'} · ${words} ${words===1?'sana':'sanaa'} · muokattu ${shortStamp(n.updated)}</div>`;
-  sc.innerHTML=h;
-  if(keepScroll)sc.scrollTop=y;
-  if(vEdit){
-    const ti=$('vTitleIn'),bi=$('vBodyIn');
-    const size=()=>{bi.style.height='auto';bi.style.height=Math.max(window.innerHeight*.45,bi.scrollHeight)+'px'};size();
-    ti.addEventListener('input',()=>{n.title=ti.value;n.updated=Date.now();persist();if($('vSide').classList.contains('open'))renderSide()});
-    ti.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();bi.focus()}});
-    bi.addEventListener('input',()=>{n.body=bi.value;n.updated=Date.now();persist();size()});
-  }
-}
-function vGo(id,noHist){
-  if(!noteById(id))return;
-  if(!noHist&&vaultId&&vaultId!==id)vHist.push(vaultId);
-  if(vaultId&&vaultId!==id)cleanupEmpty(vaultId);
-  vaultId=id;state.vaultLast=id;save();vEdit=false;closeSide();closeMenu();renderVault();$('vScroll').scrollTop=0;
-}
-function vNew(folder,title=''){
-  const n=newNote(0,0);const p=freeSpot();n.x=p.x;n.y=p.y;n.folder=folder||'';n.title=title;save();
-  if(vaultId)vHist.push(vaultId);vaultId=n.id;state.vaultLast=n.id;vEdit=true;closeSide();closeMenu();renderVault();
-  setTimeout(()=>(title?$('vBodyIn'):$('vTitleIn'))?.focus(),60);
-}
-$('vModeBtn').onclick=()=>{if(!noteById(vaultId))return;vEdit=!vEdit;closeMenu();renderVault(true);if(vEdit)setTimeout(()=>$('vBodyIn')?.focus({preventScroll:true}),30)};
-$('vBackBtn').onclick=()=>{let id;while(vHist.length&&!noteById(id=vHist.pop()));if(id&&noteById(id))vGo(id,true);else renderVault()};
-$('vScroll').addEventListener('click',e=>{
-  if(vEdit)return;
-  const wl=e.target.closest('.wl');
-  if(wl){if(wl.dataset.wl)vGo(wl.dataset.wl);else{const d=document.createElement('div');d.innerHTML=wl.dataset.name;vNew(noteById(vaultId)?.folder||'',d.textContent.trim())}return}
-  const tg=e.target.closest('[data-tag]');if(tg){openSide('search','#'+tg.dataset.tag);return}
-  const task=e.target.closest('.task');
-  if(task){const n=noteById(vaultId),L=(n.body||'').split('\n'),i=+task.dataset.line;
-    L[i]=L[i].replace(/\[( |x|X)\]/,m=>m==='[ ]'?'[x]':'[ ]');n.body=L.join('\n');n.updated=Date.now();save();renderVault(true);return}
-  const o=e.target.closest('[data-open]');if(o)vGo(o.dataset.open);
-});
 
-/* sidebar */
-function openSide(tab,q){if(tab)vTab=tab;if(q!=null)vQuery=q;renderSide();$('vSide').classList.add('open');$('vDim').classList.add('open');closeMenu();
-  if(vTab==='search')setTimeout(()=>$('vSearch')?.focus(),300)}
-function closeSide(){$('vSide').classList.remove('open');$('vDim').classList.remove('open');vAddFolder=false;document.activeElement?.blur?.()}
-$('vSideBtn').onclick=()=>$('vSide').classList.contains('open')?closeSide():openSide();
-$('vDim').onclick=closeSide;
-document.querySelectorAll('[data-vtab]').forEach(b=>b.onclick=()=>{vTab=b.dataset.vtab;vAddFolder=false;renderSide();if(vTab==='search')setTimeout(()=>$('vSearch')?.focus(),30)});
 function allFolders(){return [...new Set([...state.folders,...state.notes.map(n=>n.folder).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,'fi'))}
-function renderSide(){
-  document.querySelectorAll('[data-vtab]').forEach(b=>b.classList.toggle('on',b.dataset.vtab===vTab));
-  $('vCount').textContent=`${state.notes.length} ${state.notes.length===1?'muistio':'muistiota'}`;
-  const t=$('vTree');
-  if(vTab==='files'){
+function persistOpen(){state.vaultOpenFolders=[...vOpen];save()}
+function defaultNoteId(){const last=noteById(state.vaultLast);return last?last.id:([...state.notes].sort((a,b)=>b.updated-a.updated)[0]||{}).id||null}
+let panels=Array.isArray(state.vaultPanels)&&state.vaultPanels.length?state.vaultPanels.map(x=>({...x})):[{pid:uid(),type:'files'},{pid:uid(),type:'note',noteId:null},{pid:uid(),type:'graph'}];
+panels.forEach(p=>{p.hist=[];p.edit=false;p.tab=p.tab||'files';p.q=p.q||'';p.view=null});
+let activeNote=(panels.find(p=>p.type==='note')||{}).pid||null;
+function savePanels(){state.vaultPanels=panels.map(p=>({pid:p.pid,type:p.type,noteId:p.noteId||null,tab:p.tab,q:p.q}));save()}
+const P=pid=>panels.find(p=>p.pid===pid);
+const panelEl=p=>vStrip.querySelector(`[data-pid="${p.pid}"]`);
+function selNote(){const a=P(activeNote);return a&&a.type==='note'?a.noteId:null}
+function vaultGraphsVisible(){return !vaultEl.hidden&&panels.some(p=>p.type==='graph')}
+function vaultDefault(){panels.forEach(p=>{if(p.type==='note'&&p.noteId&&!noteById(p.noteId))p.noteId=null});
+  const first=panels.find(p=>p.type==='note');if(first&&!first.noteId&&!panels.some(p=>p.type==='note'&&p.noteId))first.noteId=defaultNoteId()}
+function panelTitle(p){if(p.type==='note'){const n=noteById(p.noteId);return n?noteName(n):'Uusi välilehti'}return TYPE[p.type].name}
+
+function renderVault(){
+  closeAdd();closeMenu();
+  if(!panels.length){
+    vStrip.innerHTML=`<div class="v-none"><div>Ei avoimia paneeleja</div><div class="v-none-btns">${['files','note','graph'].map(t=>`<button data-addtype="${t}">${svg(TYPE[t].ic,18)}${TYPE[t].name}</button>`).join('')}</div></div>`;return}
+  vStrip.innerHTML=panels.map((p,i)=>`<section class="vp vp-${p.type} ${p.pid===activeNote?'act':''}" data-pid="${p.pid}">
+    <header class="vp-tabs"><div class="vp-tab"><span class="vp-ic">${svg(TYPE[p.type].ic,15)}</span><span class="vp-name"></span><button class="vp-x" data-close="${p.pid}" aria-label="Sulje paneeli">${svg('x',14,2.2)}</button></div>${i===panels.length-1&&panels.length<PANEL_MAX?`<button class="vp-plus" data-plus aria-label="Lisää paneeli">${svg('plus',17,2)}</button>`:''}</header>
+    <div class="vp-tools"></div><div class="vp-body"></div></section>`).join('');
+  if(panels.some(p=>p.type==='graph'))rebuildGraph(gNodes.size===0);
+  panels.forEach(p=>renderPanel(p));
+}
+function renderPanel(p,keep){
+  const el=panelEl(p);if(!el)return;
+  const tools=el.querySelector('.vp-tools'),body=el.querySelector('.vp-body');
+  el.querySelector('.vp-name').textContent=panelTitle(p);
+  if(p.type==='files'){
+    tools.innerHTML=['files','search','tags'].map(t=>`<button class="icon-btn ${p.tab===t?'on':''}" data-ftab="${t}" aria-label="${{files:'Tiedostot',search:'Haku',tags:'Tunnisteet'}[t]}">${svg({files:'folder',search:'search',tags:'tag'}[t],18)}</button>`).join('')+
+      `<span class="v-sp"></span><button class="icon-btn" data-act="newnote" aria-label="Uusi muistio">${svg('compose',18)}</button><button class="icon-btn" data-act="newfolder" aria-label="Uusi kansio">${svg('folderPlus',18)}</button>`;
+    renderFiles(p,body);
+  }else if(p.type==='note'){
+    const n=noteById(p.noteId);
+    tools.innerHTML=(p.hist.length?`<button class="icon-btn" data-act="back" aria-label="Takaisin">${svg('left',18,2)}</button>`:'')+'<span class="v-sp"></span>'+
+      (n?`<button class="icon-btn" data-act="mode" aria-label="${p.edit?'Lukutila':'Muokkaa'}">${svg(p.edit?'book':'pencil',18)}</button><button class="icon-btn" data-act="more" aria-label="Lisää toimintoja">${svg('more',18)}</button>`:'');
+    renderNoteBody(p,body,keep);
+  }else{
+    tools.innerHTML=`<span class="v-sp"></span><button class="icon-btn" data-act="fit" aria-label="Sovita">${svg('fit',18)}</button>`;
+    if(!body.querySelector('canvas')){body.innerHTML='<canvas></canvas>';setupGraphPanel(p,body)}
+  }
+}
+
+/* files pane */
+function renderFiles(p,body){
+  const sel=selNote();
+  if(p.tab==='files'){
     const byName=(a,b)=>noteName(a).localeCompare(noteName(b),'fi');
-    const row=(n,nested)=>`<button class="v-row file ${nested?'nested':''} ${n.id===vaultId?'on':''}" data-open="${n.id}"><span class="nm">${esc(noteName(n))}</span></button>`;
-    let h=vAddFolder?`<input class="v-inp" id="vFolderIn" placeholder="Kansion nimi" maxlength="40">`:'';
+    const row=(n,nested)=>`<button class="v-row file ${nested?'nested':'root'} ${n.id===sel?'on':''}" data-open="${n.id}"><span class="nm">${esc(noteName(n))}</span></button>`;
+    let h=p.addFolder?`<input class="v-inp" data-folderin placeholder="Kansion nimi" maxlength="40">`:'';
     for(const f of allFolders()){
       const ns=state.notes.filter(n=>n.folder===f).sort(byName),open=vOpen.has(f);
-      h+=`<button class="v-row ${open?'':'closed'}" data-folder="${esc(f)}"><span class="chev-s">${svg('chev',16,2.2)}</span><span class="nm">${esc(f)}</span><span class="cnt">${ns.length}</span></button>`;
+      h+=`<button class="v-row ${open?'':'closed'}" data-folder="${esc(f)}"><span class="chev-s">${svg('chev',15,2.2)}</span><span class="nm">${esc(f)}</span><span class="cnt">${ns.length}</span></button>`;
       if(open)h+=ns.map(n=>row(n,true)).join('');
     }
-    h+=state.notes.filter(n=>!n.folder).sort(byName).map(n=>row(n,false).replace('v-row file ','v-row file ').replace('padding-left','')).join('');
-    t.innerHTML=h;
-    t.querySelectorAll('.v-row.file:not(.nested)').forEach(el=>el.style.paddingLeft='12px');
-    const fi=$('vFolderIn');
-    if(fi){fi.focus();const done=()=>{const v=fi.value.trim();vAddFolder=false;if(v&&!allFolders().includes(v)){state.folders.push(v);vOpen.add(v);persistOpen();save()}renderSide()};
-      fi.addEventListener('keydown',e=>{if(e.key==='Enter')done();if(e.key==='Escape'){vAddFolder=false;renderSide()}});fi.addEventListener('blur',done)}
-  }else if(vTab==='search'){
-    t.innerHTML=`<input class="v-inp" id="vSearch" type="search" placeholder="Hae muistioista tai #tunniste" value="${esc(vQuery)}" autocomplete="off"><div id="vResults"></div>`;
-    $('vSearch').addEventListener('input',e=>{vQuery=e.target.value;renderResults()});renderResults();
+    h+=state.notes.filter(n=>!n.folder).sort(byName).map(n=>row(n,false)).join('');
+    body.innerHTML=h||'<div class="v-label">Ei muistioita</div>';
+    const fi=body.querySelector('[data-folderin]');
+    if(fi){fi.focus();let done=false;const fin=()=>{if(done)return;done=true;const v=fi.value.trim();p.addFolder=false;
+        if(v&&!allFolders().includes(v)){state.folders.push(v);vOpen.add(v);persistOpen();save()}renderPanel(p)};
+      fi.addEventListener('keydown',e=>{if(e.key==='Enter')fin();if(e.key==='Escape'){fi.value='';fin()}});fi.addEventListener('blur',fin)}
+  }else if(p.tab==='search'){
+    body.innerHTML=`<input class="v-inp" data-search type="search" placeholder="Hae tai #tunniste" value="${esc(p.q)}" autocomplete="off"><div data-results></div>`;
+    const inp=body.querySelector('[data-search]');inp.addEventListener('input',()=>{p.q=inp.value;renderResults(p,body)});renderResults(p,body);
   }else{
     const counts=new Map();state.notes.forEach(n=>tagsOf(n).forEach(g=>counts.set(g,(counts.get(g)||0)+1)));
     const tags=[...counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'fi'));
-    t.innerHTML=`<div class="v-label">Tunnisteet</div>`+(tags.length?tags.map(([g,c])=>`<button class="v-row" data-tagq="${esc(g)}"><span class="nm" style="color:var(--v-acc)">#${esc(g)}</span><span class="cnt">${c}</span></button>`).join(''):'<div class="v-empty" style="padding:30px 10px">Ei tunnisteita vielä.<br>Kirjoita muistioon esim. #idea</div>');
+    body.innerHTML=`<div class="v-label">Tunnisteet</div>`+(tags.length?tags.map(([g,c])=>`<button class="v-row" data-tagq="${esc(g)}"><span class="nm" style="color:var(--v-acc)">#${esc(g)}</span><span class="cnt">${c}</span></button>`).join(''):'<div class="v-label" style="text-transform:none;letter-spacing:0;font-weight:400">Ei tunnisteita vielä. Kirjoita muistioon esim. #idea</div>');
   }
 }
-function renderResults(){
-  const q=vQuery.trim().toLowerCase(),r=$('vResults');if(!r)return;
+function renderResults(p,body){
+  const q=(p.q||'').trim().toLowerCase(),r=body.querySelector('[data-results]');if(!r)return;
   if(!q){r.innerHTML='<div class="v-label">Kirjoita hakusana</div>';return}
-  const hits=state.notes.filter(n=>q.startsWith('#')?tagsOf(n).includes(q.slice(1)):(noteName(n)+'\n'+(n.body||'')).toLowerCase().includes(q));
-  const hl=txt=>{const i=txt.toLowerCase().indexOf(q);if(i<0||q.startsWith('#'))return esc(txt);return esc(txt.slice(0,i))+'<mark>'+esc(txt.slice(i,i+q.length))+'</mark>'+esc(txt.slice(i+q.length))};
+  const isTag=q.startsWith('#');
+  const hits=state.notes.filter(n=>isTag?tagsOf(n).includes(q.slice(1)):(noteName(n)+'\n'+(n.body||'')).toLowerCase().includes(q));
+  const hl=txt=>{const i=txt.toLowerCase().indexOf(q);if(i<0||isTag)return esc(txt);return esc(txt.slice(0,i))+'<mark>'+esc(txt.slice(i,i+q.length))+'</mark>'+esc(txt.slice(i+q.length))};
   r.innerHTML=`<div class="v-label">${hits.length} ${hits.length===1?'tulos':'tulosta'}</div>`+hits.map(n=>{
     const line=(n.body||'').split('\n').find(l=>l.toLowerCase().includes(q))||firstLine(n.body)||'';
     return `<button class="v-res" data-open="${n.id}"><b>${hl(noteName(n))}</b><span>${hl(line.trim().slice(0,90))}</span></button>`}).join('');
 }
-function persistOpen(){state.vaultOpenFolders=[...vOpen];save()}
-$('vTree').addEventListener('click',e=>{
-  const f=e.target.closest('[data-folder]');if(f){const d=document.createElement('div');d.innerHTML=f.dataset.folder;const name=d.textContent;
-    vOpen.has(name)?vOpen.delete(name):vOpen.add(name);persistOpen();renderSide();return}
-  const tq=e.target.closest('[data-tagq]');if(tq){vTab='search';vQuery='#'+tq.dataset.tagq;renderSide();return}
-  const o=e.target.closest('[data-open]');if(o)vGo(o.dataset.open);
+
+/* note pane */
+function renderNoteBody(p,body,keep){
+  const y=body.scrollTop,n=noteById(p.noteId);
+  if(!n){
+    const rec=[...state.notes].sort((a,b)=>b.updated-a.updated).slice(0,12);
+    body.innerHTML=`<div class="v-label" style="padding-top:14px">Avaa muistio</div>`+rec.map(r=>`<button class="v-res" data-open="${r.id}"><b>${esc(noteName(r))}</b><span>${esc(firstLine(r.body))}</span></button>`).join('')+
+      `<button class="v-res" data-act="newhere"><b style="color:var(--v-acc)">+ Uusi muistio</b></button>`;return}
+  const words=((n.body||'').match(/\S+/g)||[]).length,bl=backlinksOf(n.id);
+  const manual=state.links.filter(l=>l.includes(n.id)).map(l=>noteById(l[0]===n.id?l[1]:l[0])).filter(Boolean);
+  let h=n.folder?`<div class="v-path">${svg('folder',13)}${esc(n.folder)}</div>`:'';
+  if(p.edit){
+    h+=`<input class="v-title" data-title value="${esc(n.title||'')}" placeholder="Nimetön" autocomplete="off">
+      <div class="v-edit"><textarea data-body placeholder="Aloita kirjoittaminen…&#10;&#10;# Otsikko, - [ ] tehtävä, > lainaus, [[linkki]], #tunniste">${esc(n.body||'')}</textarea></div>`;
+  }else{
+    h+=`<div class="v-title">${esc(noteName(n))}</div><div class="md">${mdRender(n.body)||'<p class="v-muted">Tyhjä muistio. Napauta kynää kirjoittaaksesi.</p>'}</div>`;
+  }
+  if(bl.length)h+=`<div class="v-sec"><h4>Takalinkit · ${bl.length}</h4>${bl.map(b=>`<button class="v-bl" data-open="${b.id}"><b>${esc(noteName(b))}</b><span>${esc(snippetFor(b,n.id))}</span></button>`).join('')}</div>`;
+  if(manual.length)h+=`<div class="v-sec"><h4>Mielikartassa · ${manual.length}</h4>${manual.map(b=>`<button class="v-bl" data-open="${b.id}"><b>${esc(noteName(b))}</b><span>${esc(firstLine(b.body))}</span></button>`).join('')}</div>`;
+  h+=`<div class="v-status">${bl.length} ${bl.length===1?'takalinkki':'takalinkkiä'} · ${words} ${words===1?'sana':'sanaa'} · ${shortStamp(n.updated)}</div>`;
+  body.innerHTML=h;body.scrollTop=keep?y:0;
+  if(p.edit){
+    const ti=body.querySelector('[data-title]'),bi=body.querySelector('[data-body]');
+    const size=()=>{bi.style.height='auto';bi.style.height=Math.max(body.clientHeight*.6,bi.scrollHeight)+'px'};size();
+    ti.addEventListener('input',()=>{n.title=ti.value;n.updated=Date.now();persist();panelEl(p).querySelector('.vp-name').textContent=panelTitle(p)});
+    ti.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();bi.focus()}});
+    bi.addEventListener('input',()=>{n.body=bi.value;n.updated=Date.now();persist();size()});
+    [ti,bi].forEach(x=>x.addEventListener('change',()=>{scheduleGraph();refreshOthers(p)}));
+  }
+}
+function refreshOthers(except){
+  panels.forEach(q=>{if(q===except)return;if(q.type==='files'||(q.type==='note'&&!q.edit))renderPanel(q,true)});
+  markActive();drawPanelGraphs();
+}
+function markActive(){vStrip.querySelectorAll('.vp').forEach(el=>el.classList.toggle('act',el.dataset.pid===activeNote))}
+function scrollToPanel(p){const el=panelEl(p);if(!el)return;const r=el.getBoundingClientRect(),vr=vStrip.getBoundingClientRect();
+  if(r.left<vr.left||r.right>vr.right)vStrip.scrollTo({left:vStrip.scrollLeft+r.left-vr.left,behavior:'smooth'})}
+function targetNotePanel(){
+  let t=P(activeNote);if(t&&t.type==='note')return t;
+  t=panels.find(p=>p.type==='note');if(t)return t;
+  const np={pid:uid(),type:'note',noteId:null,hist:[],edit:false,tab:'files',q:'',view:null};
+  if(panels.length<PANEL_MAX){const gi=panels.findIndex(p=>p.type==='graph');panels.splice(gi<0?panels.length:gi,0,np)}
+  else{const i=panels.map(p=>p.type).lastIndexOf('graph');panels[i<0?panels.length-1:i]=np}
+  needFull=true;return np;
+}
+function openInNote(id,edit){
+  needFull=false;const t=targetNotePanel(),old=t.noteId;
+  if(old&&old!==id)t.hist.push(old);
+  t.noteId=id;t.edit=!!edit;activeNote=t.pid;state.vaultLast=id;savePanels();
+  if(old&&old!==id&&!panels.some(p=>p.noteId===old)&&cleanupEmpty(old))t.hist=t.hist.filter(x=>x!==old);
+  if(needFull)renderVault();else{renderPanel(t);refreshOthers(t)}
+  scrollToPanel(t);
+  if(edit)setTimeout(()=>{const el=panelEl(t);(el?.querySelector('[data-title]'))?.focus()},80);
+}
+function newVaultNote(folder,title=''){const n=newNote(0,0);const sp=freeSpot();n.x=sp.x;n.y=sp.y;n.folder=folder||'';n.title=title;save();return n}
+
+/* pane add / close */
+function addPanel(type){
+  if(panels.length>=PANEL_MAX){toast('Enintään 3 paneelia');return}
+  const p={pid:uid(),type,noteId:null,hist:[],edit:false,tab:'files',q:'',view:null};
+  panels.push(p);if(type==='note')activeNote=p.pid;savePanels();renderVault();requestAnimationFrame(()=>scrollToPanel(p));
+}
+function closePanel(pid){
+  const p=P(pid);if(!p)return;
+  panels=panels.filter(x=>x!==p);
+  if(p.noteId&&!panels.some(x=>x.noteId===p.noteId))cleanupEmpty(p.noteId);
+  if(activeNote===pid)activeNote=(panels.find(x=>x.type==='note')||{}).pid||null;
+  savePanels();renderVault();
+}
+function openAdd(btn){
+  const a=$('vAdd'),vr=vaultEl.getBoundingClientRect(),r=btn.getBoundingClientRect();
+  a.innerHTML=[['note','Muistio'],['graph','Graafi'],['files','Kansiot ja lista']].map(([t,l])=>`<button data-addtype="${t}">${svg(TYPE[t].ic,18)}${l}</button>`).join('');
+  a.hidden=false;a.style.top=(r.bottom-vr.top+4)+'px';a.style.left=Math.max(6,Math.min(r.right-vr.left-210,vr.width-216))+'px';
+}
+function closeAdd(){$('vAdd').hidden=true}
+function closeSide(){closeAdd()}
+$('vAdd').addEventListener('click',e=>{const b=e.target.closest('[data-addtype]');if(b)addPanel(b.dataset.addtype)});
+
+/* clicks inside panes */
+vStrip.addEventListener('click',e=>{
+  const t=e.target;
+  const cl=t.closest('[data-close]');if(cl){closePanel(cl.dataset.close);return}
+  const pl=t.closest('[data-plus]');if(pl){$('vAdd').hidden?openAdd(pl):closeAdd();return}
+  const ad=t.closest('[data-addtype]');if(ad){addPanel(ad.dataset.addtype);return}
+  const sec=t.closest('.vp'),p=sec&&P(sec.dataset.pid);if(!p)return;
+  if(p.type==='note'&&activeNote!==p.pid){activeNote=p.pid;markActive();renderPanelsOfType('files');drawPanelGraphs()}
+  const a=t.closest('[data-act]');
+  if(a){
+    const act=a.dataset.act;
+    if(act==='newnote'){const cur=noteById(selNote());openInNote(newVaultNote(cur?.folder||'').id,true)}
+    if(act==='newfolder'){p.tab='files';p.addFolder=true;renderPanel(p)}
+    if(act==='newhere'){activeNote=p.pid;openInNote(newVaultNote('').id,true)}
+    if(act==='back'){let id;while(p.hist.length&&!noteById(id=p.hist.pop()));if(id&&noteById(id)){p.noteId=id;p.edit=false;state.vaultLast=id;savePanels();renderPanel(p);refreshOthers(p)}else renderPanel(p)}
+    if(act==='mode'){p.edit=!p.edit;renderPanel(p,true);if(!p.edit)refreshOthers(p);else setTimeout(()=>panelEl(p)?.querySelector('[data-body]')?.focus({preventScroll:true}),40)}
+    if(act==='more'){openMenu(p,a)}
+    if(act==='fit')fitPanelGraph(p,true);
+    return;
+  }
+  if(p.type==='files'){
+    const ft=t.closest('[data-ftab]');if(ft){p.tab=ft.dataset.ftab;p.addFolder=false;savePanels();renderPanel(p);if(p.tab==='search')setTimeout(()=>panelEl(p)?.querySelector('[data-search]')?.focus(),30);return}
+    const f=t.closest('[data-folder]');if(f){const d=document.createElement('div');d.innerHTML=f.dataset.folder;const nm=d.textContent;vOpen.has(nm)?vOpen.delete(nm):vOpen.add(nm);persistOpen();renderPanel(p,true);return}
+    const tq=t.closest('[data-tagq]');if(tq){p.tab='search';p.q='#'+tq.dataset.tagq;savePanels();renderPanel(p);return}
+    const o=t.closest('[data-open]');if(o)openInNote(o.dataset.open);
+    return;
+  }
+  if(p.type==='note'&&!p.edit){
+    const wl=t.closest('.wl');
+    if(wl){if(wl.dataset.wl)openInNote(wl.dataset.wl);else{const d=document.createElement('div');d.innerHTML=wl.dataset.name;openInNote(newVaultNote(noteById(p.noteId)?.folder||'',d.textContent.trim()).id,true)}return}
+    const tg=t.closest('[data-tag]');
+    if(tg){const fp=panels.find(x=>x.type==='files');
+      if(fp){fp.tab='search';fp.q='#'+tg.dataset.tag;savePanels();renderPanel(fp);scrollToPanel(fp)}
+      else if(panels.length<PANEL_MAX){const np={pid:uid(),type:'files',tab:'search',q:'#'+tg.dataset.tag,hist:[],edit:false,view:null};panels.unshift(np);savePanels();renderVault()}
+      else toast('Avaa Kansiot-paneeli hakeaksesi tunnisteella');
+      return}
+    const task=t.closest('.task');
+    if(task){const n=noteById(p.noteId),L=(n.body||'').split('\n'),i=+task.dataset.line;
+      L[i]=L[i].replace(/\[( |x|X)\]/,m=>m==='[ ]'?'[x]':'[ ]');n.body=L.join('\n');n.updated=Date.now();save();renderPanel(p,true);return}
+    const o=t.closest('[data-open]');if(o)openInNote(o.dataset.open);
+  }else if(p.type==='note'){const o=t.closest('[data-open]');if(o)openInNote(o.dataset.open)}
 });
-$('vNewNote').onclick=()=>vNew(noteById(vaultId)?.folder||'');
-$('vNewFolder').onclick=()=>{vTab='files';vAddFolder=true;renderSide()};
+function renderPanelsOfType(type){panels.forEach(p=>{if(p.type===type)renderPanel(p,true)})}
+
+/* graph panes */
+const gRO=new ResizeObserver(es=>{for(const en of es){const sec=en.target.closest('.vp');const p=sec&&P(sec.dataset.pid);if(p&&p.cv){sizeCv(p);if(p.view)drawGraphTo(p.cv,p.view,selNote());else fitPanelGraph(p,false)}}});
+function sizeCv(p){const r=p.cv.parentElement.getBoundingClientRect(),d=devicePixelRatio||1;if(!r.width)return;p.cv.width=Math.round(r.width*d);p.cv.height=Math.round(r.height*d)}
+function drawPanelGraphs(){if(typeof panels==='undefined'||vaultEl.hidden)return;const sel=selNote();panels.forEach(p=>{if(p.type==='graph'&&p.cv&&p.view)drawGraphTo(p.cv,p.view,sel)})}
+function fitPanelGraph(p,anim){
+  if(!p.cv)return;const r=p.cv.parentElement.getBoundingClientRect();if(!r.width)return;
+  const ns=[...gNodes.values()];let t;
+  if(!ns.length)t={x:r.width/2,y:r.height/2,k:1};
+  else{const xs=ns.map(n=>n.x),ys=ns.map(n=>n.y),minX=Math.min(...xs)-40,maxX=Math.max(...xs)+40,minY=Math.min(...ys)-26,maxY=Math.max(...ys)+40;
+    const bottom=Math.min(r.height*.35,110),k=Math.max(.15,Math.min(1.4,(r.width-12)/(maxX-minX),(r.height-12-bottom)/(maxY-minY)));
+    t={k,x:r.width/2-(minX+maxX)/2*k,y:8+(r.height-12-bottom)/2-(minY+maxY)/2*k}}
+  if(!anim||!p.view){p.view=t;drawGraphTo(p.cv,p.view,selNote());return}
+  const s0={...p.view},t0=performance.now();
+  const step=now=>{const e=Math.min(1,(now-t0)/380),q=1-Math.pow(1-e,3);p.view={x:s0.x+(t.x-s0.x)*q,y:s0.y+(t.y-s0.y)*q,k:s0.k+(t.k-s0.k)*q};drawGraphTo(p.cv,p.view,selNote());if(e<1)requestAnimationFrame(step)};
+  requestAnimationFrame(step);
+}
+function setupGraphPanel(p,body){
+  p.cv=body.querySelector('canvas');gRO.observe(body);
+  requestAnimationFrame(()=>{sizeCv(p);if(!p.view)fitPanelGraph(p,false);else drawGraphTo(p.cv,p.view,selNote())});
+  const ptr=new Map();let g=null;
+  const rel=e=>{const r=body.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+  const hit=pt=>{const v=p.view;if(!v)return null;const wx=(pt.x-v.x)/v.k,wy=(pt.y-v.y)/v.k;let best=null,bd=1e9;
+    for(const n of gNodes.values()){const dd=Math.hypot(n.x-wx,n.y-wy);if(dd<gRadius(n.id)+16/v.k&&dd<bd){bd=dd;best=n}}return best};
+  body.addEventListener('pointerdown',e=>{
+    e.preventDefault();try{body.setPointerCapture(e.pointerId)}catch(_){}
+    const pt=rel(e);ptr.set(e.pointerId,pt);
+    if(ptr.size===1){const n=hit(pt);g=n?{t:'node',n,sx:pt.x,sy:pt.y,moved:false}:{t:'pan',sx:pt.x,sy:pt.y,vx:p.view.x,vy:p.view.y,moved:false}}
+    else if(ptr.size===2){if(g&&g.t==='node'){g.n.fx=g.n.fy=null;gDrag=false}const [a,b]=[...ptr.values()];
+      g={t:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,k0:p.view.k,wx:((a.x+b.x)/2-p.view.x)/p.view.k,wy:((a.y+b.y)/2-p.view.y)/p.view.k}}
+  });
+  body.addEventListener('pointermove',e=>{
+    if(!ptr.has(e.pointerId)||!g)return;const pt=rel(e);ptr.set(e.pointerId,pt);
+    if(g.t==='pinch'&&ptr.size>=2){const [a,b]=[...ptr.values()],dd=Math.hypot(a.x-b.x,a.y-b.y),k=Math.max(.15,Math.min(3,g.k0*dd/g.d0));
+      p.view={k,x:(a.x+b.x)/2-g.wx*k,y:(a.y+b.y)/2-g.wy*k};drawGraphTo(p.cv,p.view,selNote());return}
+    const dx=pt.x-g.sx,dy=pt.y-g.sy;if(!g.moved&&Math.hypot(dx,dy)>6)g.moved=true;if(!g.moved)return;
+    if(g.t==='node'){g.n.fx=(pt.x-p.view.x)/p.view.k;g.n.fy=(pt.y-p.view.y)/p.view.k;gDrag=true;kick(.3)}
+    else if(g.t==='pan'){p.view.x=g.vx+dx;p.view.y=g.vy+dy;drawGraphTo(p.cv,p.view,selNote())}
+  });
+  const end=e=>{if(!ptr.has(e.pointerId))return;ptr.delete(e.pointerId);if(!g)return;
+    if(g.t==='node'){g.n.fx=g.n.fy=null;gDrag=false;if(!g.moved&&e.type==='pointerup')openInNote(g.n.id);g=null}
+    else if(g.t==='pan')g=null;else if(ptr.size<2)g=null};
+  body.addEventListener('pointerup',end);body.addEventListener('pointercancel',end);
+  body.addEventListener('wheel',e=>{e.preventDefault();const pt=rel(e),v=p.view,k=Math.max(.15,Math.min(3,v.k*Math.exp(-e.deltaY*.0015)));
+    const wx=(pt.x-v.x)/v.k,wy=(pt.y-v.y)/v.k;p.view={k,x:pt.x-wx*k,y:pt.y-wy*k};drawGraphTo(p.cv,p.view,selNote())},{passive:false});
+}
 
 /* ⋯ menu */
 function closeMenu(){$('vMenu').classList.remove('open');vMenuMode='main';vDelArmed=false}
+function openMenu(p,btn){
+  vMenuCtx=p;vMenuMode='main';vDelArmed=false;renderMenu();
+  const m=$('vMenu'),vr=vaultEl.getBoundingClientRect(),r=btn.getBoundingClientRect();
+  m.style.top=(r.bottom-vr.top+4)+'px';m.style.right='auto';m.style.left=Math.max(6,Math.min(r.right-vr.left-240,vr.width-246))+'px';m.classList.add('open');
+}
 function renderMenu(){
-  const n=noteById(vaultId),m=$('vMenu');
+  const p=vMenuCtx,n=p&&noteById(p.noteId),m=$('vMenu');
   if(vMenuMode==='move'){
     m.innerHTML=`<div class="v-label">Siirrä kansioon</div><button data-mv="">${svg('note',18)}Ei kansiota</button>`+
       allFolders().map(f=>`<button data-mv="${esc(f)}" class="${n&&n.folder===f?'on':''}">${svg('folder',18)}${esc(f)}</button>`).join('')+
       `<hr><input class="v-inp" id="vMvNew" placeholder="+ Uusi kansio" maxlength="40">`;
-    const inp=$('vMvNew');inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim()){moveTo(inp.value.trim())}});
-    return;
-  }
-  m.innerHTML=`<button data-act="new">${svg('compose',18)}Uusi muistio</button>`+
-    (n?`<button data-act="move">${svg('folder',18)}Siirrä kansioon…</button>
-    <button data-act="graph">${svg('graph',18)}Näytä graafissa</button>
-    <button data-act="pin">${svg('tack',18)}${n.pinned?'Poista kiinnitys':'Kiinnitä'}</button><hr>
-    <button data-act="del" class="danger">${svg('trash',18)}${vDelArmed?'Napauta uudelleen poistaaksesi':'Poista muistio'}</button>`:'');
+    const inp=$('vMvNew');inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim())moveTo(inp.value.trim())});return}
+  m.innerHTML=`<button data-mact="new">${svg('compose',18)}Uusi muistio</button>`+(n?`
+    <button data-mact="move">${svg('folder',18)}Siirrä kansioon…</button>
+    <button data-mact="graph">${svg('graph',18)}Näytä graafissa</button>
+    <button data-mact="pin">${svg('tack',18)}${n.pinned?'Poista kiinnitys':'Kiinnitä'}</button><hr>
+    <button data-mact="del" class="danger">${svg('trash',18)}${vDelArmed?'Napauta uudelleen poistaaksesi':'Poista muistio'}</button>`:'');
 }
-function moveTo(f){const n=noteById(vaultId);if(!n)return;n.folder=f;if(f&&!state.folders.includes(f))state.folders.push(f);if(f)vOpen.add(f);persistOpen();save();closeMenu();renderVault(true);toast(f?`Siirretty: ${f}`:'Siirretty juureen')}
-$('vMoreBtn').onclick=e=>{e.stopPropagation();const m=$('vMenu');if(m.classList.contains('open')){closeMenu();return}vMenuMode='main';vDelArmed=false;renderMenu();m.classList.add('open')};
+function moveTo(f){const n=noteById(vMenuCtx?.noteId);if(!n)return;n.folder=f;if(f&&!state.folders.includes(f))state.folders.push(f);if(f)vOpen.add(f);persistOpen();save();closeMenu();renderPanel(vMenuCtx,true);renderPanelsOfType('files');toast(f?`Siirretty: ${f}`:'Siirretty juureen')}
 $('vMenu').addEventListener('click',e=>{
-  e.stopPropagation();
+  e.stopPropagation();const p=vMenuCtx,n=p&&noteById(p.noteId);
   const mv=e.target.closest('[data-mv]');if(mv){const d=document.createElement('div');d.innerHTML=mv.dataset.mv;moveTo(d.textContent);return}
-  const a=e.target.closest('[data-act]');if(!a)return;const n=noteById(vaultId);
-  if(a.dataset.act==='new')vNew(n?.folder||'');
-  if(a.dataset.act==='move'){vMenuMode='move';renderMenu()}
-  if(a.dataset.act==='graph'&&n){closeMenu();const id=n.id;setNotesMode('graph');setTimeout(()=>{gSel=id;drawGraph()},120)}
-  if(a.dataset.act==='pin'&&n){n.pinned=!n.pinned;save();closeMenu();toast(n.pinned?'Kiinnitetty':'Kiinnitys poistettu')}
-  if(a.dataset.act==='del'&&n){
+  const a=e.target.closest('[data-mact]');if(!a)return;const act=a.dataset.mact;
+  if(act==='new'){closeMenu();activeNote=p.pid;openInNote(newVaultNote(n?.folder||'').id,true)}
+  if(act==='move'){vMenuMode='move';renderMenu()}
+  if(act==='graph'&&n){closeMenu();activeNote=p.pid;markActive();
+    const gp=panels.find(x=>x.type==='graph');
+    if(gp){drawPanelGraphs();scrollToPanel(gp)}else if(panels.length<PANEL_MAX)addPanel('graph');
+    else{const id=n.id;setNotesMode('graph');setTimeout(()=>{gSel=id;drawGraph()},120)}}
+  if(act==='pin'&&n){n.pinned=!n.pinned;save();closeMenu();toast(n.pinned?'Kiinnitetty':'Kiinnitys poistettu')}
+  if(act==='del'&&n){
     if(!vDelArmed){vDelArmed=true;renderMenu();return}
-    state.notes=state.notes.filter(x=>x.id!==n.id);state.links=state.links.filter(l=>!l.includes(n.id));
-    vHist=vHist.filter(x=>x!==n.id);vaultId=null;save();closeMenu();vaultDefault();renderVault();toast('Muistio poistettu');
+    const id=n.id;state.notes=state.notes.filter(x=>x.id!==id);state.links=state.links.filter(l=>!l.includes(id));
+    panels.forEach(x=>{x.hist=(x.hist||[]).filter(h=>h!==id);if(x.noteId===id)x.noteId=x.hist.pop()||null});
+    save();savePanels();closeMenu();rebuildGraph(false);renderVault();toast('Muistio poistettu');
   }
 });
-vaultEl.addEventListener('pointerdown',e=>{if($('vMenu').classList.contains('open')&&!e.target.closest('#vMenu')&&!e.target.closest('#vMoreBtn'))closeMenu()});
+vaultEl.addEventListener('pointerdown',e=>{
+  if($('vMenu').classList.contains('open')&&!e.target.closest('#vMenu')&&!e.target.closest('[data-act=more]'))closeMenu();
+  if(!$('vAdd').hidden&&!e.target.closest('#vAdd')&&!e.target.closest('[data-plus]'))closeAdd();
+});
 
 function renderNotes(){if(notesMode==='map'){renderMap();if(!openId)requestAnimationFrame(()=>fitMap(false))}else if(notesMode==='graph'){requestAnimationFrame(()=>{sizeCanvas();rebuildGraph(true);if(!openId)fitGraph(false)})}else if(notesMode==='vault'){vaultDefault();renderVault()}else renderNoteList()}
 
