@@ -21,19 +21,7 @@
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   --nav-h:62px;
 }
-/* 1. Kerma & metsänvihreä (default above) */
-html[data-skin="sammal"]{ /* 2. Harmaa & salvianvihreä */
-  --top:#2c3a33; --accent:#3f7a5c; --accent-soft:#e1ece5;
-  --ink:#1b1f1d; --ink2:#4a514d; --muted:#8a918d; --line:#e1e4e2;
-  --bg:#f1f2f0; --bg2:#e6e8e5; --card:#ffffff; --red:#b5483b; --shade:24,32,28}
-html[data-skin="espresso"]{ /* 3. Espresso & kaura */
-  --top:#3a2a20; --accent:#8a5a3b; --accent-soft:#f1e6dc;
-  --ink:#231b16; --ink2:#5a4c42; --muted:#9a8b80; --line:#e8ded3;
-  --bg:#f6f1ea; --bg2:#ece3d8; --card:#fffcf8; --red:#a8473a; --shade:50,32,20}
-html[data-skin="vuono"]{ /* 4. Yönsininen & sumu */
-  --top:#26323f; --accent:#3f6385; --accent-soft:#e2e9f0;
-  --ink:#1a2028; --ink2:#4a5562; --muted:#8a95a2; --line:#e0e5ea;
-  --bg:#eef1f3; --bg2:#e3e8ec; --card:#ffffff; --red:#b04a3f; --shade:22,32,44}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
@@ -183,6 +171,79 @@ svg{display:block;flex:none}
 .skin span{display:block;padding:8px 10px;font-size:13.5px;font-weight:500}
 .hint{font-size:13px;color:var(--muted);margin:8px 20px 0;line-height:1.45}
 
+
+/* ---------- NOTES ---------- */
+.n-band{height:var(--safe-t);background:var(--top);flex:none}
+.n-head{flex:none;padding:10px 16px 10px;display:flex;flex-direction:column;gap:10px;background:var(--bg);position:relative;z-index:3}
+.n-head-row{display:flex;align-items:center;justify-content:space-between}
+.n-head h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.5px}
+.compose{color:var(--accent)}
+#page-notes.split .n-head{display:none}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);border-radius:9px;padding:2px}
+.seg button{height:30px;font-size:13.5px;font-weight:600;border-radius:7px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(var(--shade),.16)}
+.n-body{flex:1;position:relative;min-height:0}
+.n-listwrap{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.n-search{display:flex;align-items:center;gap:6px;background:var(--bg2);border-radius:10px;padding:0 10px;height:36px;color:var(--muted);margin:2px 16px 0}
+.n-search input{flex:1;border:0;outline:0;background:none;font-size:16px;color:var(--ink);min-width:0}
+.n-search input::placeholder{color:var(--muted)}
+.n-list{padding:0 16px}
+.n-sec{font-size:20px;font-weight:700;margin:20px 4px 8px;letter-spacing:-.2px;display:flex;align-items:center;gap:6px}
+.n-group{background:var(--card);border-radius:12px;overflow:hidden}
+.n-row{display:block;width:100%;text-align:left;padding:11px 16px;position:relative}
+.n-row + .n-row::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:1px solid var(--line)}
+.n-row:active{background:var(--bg2)}
+.n-row .t{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n-row .s{font-size:14.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.n-row .s b{color:var(--ink2);font-weight:400;margin-right:8px;font-variant-numeric:tabular-nums}
+.n-count{text-align:center;color:var(--muted);font-size:12.5px;margin:18px 0 0}
+.n-empty{text-align:center;color:var(--muted);padding:60px 30px;font-size:15px}
+
+.map{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;touch-action:none;background-color:var(--bg);
+  background-image:radial-gradient(color-mix(in srgb,var(--muted) 40%,transparent) 1px,transparent 1.3px);background-size:22px 22px;
+  transition:bottom .34s cubic-bezier(.3,.7,.2,1)}
+.map.split{bottom:65%}
+.world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.links{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none}
+.links path{fill:none;stroke:color-mix(in srgb,var(--accent) 50%,var(--line));stroke-width:2;stroke-linecap:round}
+.node{position:absolute;transform:translate(-50%,-50%);max-width:180px;padding:10px 15px;border-radius:14px;background:var(--card);
+  box-shadow:0 2px 8px rgba(var(--shade),.12),0 0 0 1px var(--line);font-size:14.5px;font-weight:600;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;touch-action:none;transition:box-shadow .15s,background .15s}
+.node.root{background:var(--top);color:#fff;box-shadow:0 3px 10px rgba(var(--shade),.25)}
+.node.sel{box-shadow:0 0 0 2.5px var(--accent),0 4px 12px rgba(var(--shade),.18)}
+.node.pick{background:var(--accent-soft);color:var(--ink);box-shadow:0 0 0 2.5px var(--accent)}
+.node.dragging{box-shadow:0 10px 24px rgba(var(--shade),.28),0 0 0 1px var(--line);z-index:2}
+.map-tools{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:8px;z-index:4}
+.tool{width:42px;height:42px;border-radius:12px;background:var(--card);box-shadow:0 2px 8px rgba(var(--shade),.12),0 0 0 1px var(--line);display:grid;place-items:center;color:var(--ink2)}
+.tool.on{background:var(--accent);color:#fff}
+.tool:active{transform:scale(.94)}
+.map.split .map-tools{top:8px;flex-direction:row}
+.map.split .map-tools .tool{width:36px;height:36px}
+.map-hint{position:absolute;left:12px;top:12px;max-width:calc(100% - 80px);background:var(--ink);color:var(--card);font-size:13px;padding:8px 12px;border-radius:10px;z-index:4}
+.map.split .map-hint{display:none}
+
+.editor{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--card);z-index:12;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .34s cubic-bezier(.3,.7,.2,1)}
+.editor.open{transform:none}
+.editor.split{top:calc(var(--safe-t)*.65 + 35%);border-radius:18px 18px 0 0;transform:translateY(100%);box-shadow:0 -8px 30px rgba(var(--shade),.18)}
+.editor.split.open{transform:none}
+.editor.split .n-band{display:none}
+.ed-grab{display:none;width:38px;height:5px;border-radius:3px;background:var(--line);margin:7px auto 0}
+.editor.split .ed-grab{display:block}
+.ed-bar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 8px;gap:6px}
+.ed-back{display:flex;align-items:center;gap:2px;color:var(--accent);font-size:17px;padding:8px 6px;font-weight:500}
+.ed-act{display:flex;align-items:center;gap:2px;color:var(--accent)}
+.ed-act .icon-btn.on{background:var(--accent-soft)}
+.ed-done{font-weight:700;font-size:17px;color:var(--accent);padding:8px 8px}
+.ed-del.confirm{color:var(--red)}
+.ed-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 20px calc(var(--nav-h) + var(--safe-b) + 60px)}
+.ed-date{text-align:center;color:var(--muted);font-size:13px;margin:2px 0 14px}
+#edTitle{width:100%;border:0;outline:0;background:none;font-size:27px;font-weight:700;letter-spacing:-.3px;color:var(--ink);padding:0;margin-bottom:8px}
+#edTitle::placeholder,#edBody::placeholder{color:var(--muted)}
+#edBody{width:100%;border:0;outline:0;background:none;resize:none;font-size:17px;line-height:1.45;color:var(--ink);padding:0;min-height:200px;overflow:hidden}
+.ed-links{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 0}
+.ed-links span{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+
 /* ---------- SHEET ---------- */
 .overlay{position:fixed;inset:0;background:rgba(10,14,35,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
 .overlay.open{opacity:1;pointer-events:auto}
@@ -290,8 +351,51 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
 
 <!-- ================= NOTES (placeholder) ================= -->
 <section class="page" id="page-notes">
-  <div class="simple-top"><h1>Muistiot</h1></div>
-  <div class="scroll"><div class="soon" id="notesSoon"></div></div>
+  <div class="n-band"></div>
+  <div class="n-head">
+    <div class="n-head-row">
+      <h1>Muistiot</h1>
+      <button class="icon-btn compose" id="nCompose" aria-label="Uusi muistiinpano"></button>
+    </div>
+    <div class="seg" id="nSeg">
+      <button data-mode="list" class="on" id="segList">Lista</button>
+      <button data-mode="map" id="segMap">Mielikartta</button>
+    </div>
+  </div>
+  <div class="n-body">
+    <div class="n-listwrap" id="nListWrap">
+      <label class="n-search"><span id="nSearchIc"></span><input id="nSearch" type="search" placeholder="Hae" autocomplete="off"></label>
+      <div class="n-list" id="nList"></div>
+      <div class="home-pad"></div>
+    </div>
+    <div class="map" id="map" hidden>
+      <div class="world" id="world"><svg class="links" id="links"></svg><div id="nodes"></div></div>
+      <div class="map-hint" id="mapHint" hidden>Napauta kahta muistiota yhdistääksesi ne. Napauta yhdistettyä paria poistaaksesi yhteyden.</div>
+      <div class="map-tools">
+        <button class="tool" id="tNew" aria-label="Uusi muistiinpano"></button>
+        <button class="tool" id="tLink" aria-label="Yhdistä muistiot"></button>
+        <button class="tool" id="tFit" aria-label="Sovita näkymä"></button>
+      </div>
+    </div>
+  </div>
+  <div class="editor" id="editor">
+    <div class="n-band"></div>
+    <div class="ed-grab"></div>
+    <div class="ed-bar">
+      <button class="ed-back" id="edBack"><span id="edBackIc"></span><span id="edBackTx">Muistiot</span></button>
+      <div class="ed-act">
+        <button class="icon-btn" id="edPin" aria-label="Kiinnitä"></button>
+        <button class="icon-btn ed-del" id="edDel" aria-label="Poista"></button>
+        <button class="ed-done" id="edDone" hidden>Valmis</button>
+      </div>
+    </div>
+    <div class="ed-scroll" id="edScroll">
+      <div class="ed-date" id="edDate"></div>
+      <input id="edTitle" placeholder="Otsikko" autocomplete="off" maxlength="120">
+      <textarea id="edBody" placeholder="Kirjoita muistiinpano…"></textarea>
+      <div class="ed-links" id="edLinks"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ================= PLACEHOLDER TAB ================= -->
@@ -308,19 +412,17 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <div class="group">
       <label class="row"><span>Nimi</span><input type="text" id="nameInput" placeholder="Kirjoita nimesi" autocomplete="given-name"></label>
     </div>
-    <div class="group-label">Teema</div>
-    <div class="skins" id="skins"></div>
     <div class="group-label">Tiedot</div>
     <div class="group">
       <button class="row" id="exportBtn"><span class="sp">Vie varmuuskopio</span><span id="icExport"></span></button>
       <button class="row" id="importBtn"><span class="sp">Tuo varmuuskopio</span><span id="icImport"></span></button>
-      <button class="row danger" id="demoBtn" hidden><span class="sp">Poista esimerkkisuunnitelmat</span></button>
+      <button class="row danger" id="demoBtn" hidden><span class="sp">Poista esimerkit</span></button>
       <button class="row danger" id="wipeBtn"><span class="sp">Poista kaikki suunnitelmat</span></button>
     </div>
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.2</p>
+    <p class="hint" style="margin-top:24px">Versio 0.3</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -371,6 +473,12 @@ const I={
   doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M9 17v-3M12 17v-6M15 17v-4"/>',
   up:'<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 14v5a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-5"/>',
   down:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 14v5a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-5"/>',
+  compose:'<path d="M12 3.5H6.5a3 3 0 0 0-3 3v11a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3V12"/><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9l-8.8 8.8L9 15l.7-3.5z"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  fit:'<path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/>',
+  tack:'<path d="M9 3.5h6l-1 6.5 3.5 3.5h-11L10 10z"/><path d="M12 13.5v7"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   sparkle:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'
 };
 const svg=(k,s=22,w=1.8)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
@@ -448,7 +556,6 @@ $('prevM').innerHTML=svg('left',18,2.2);
 $('nextM').innerHTML=svg('right',18,2.2);
 $('fab').innerHTML=svg('plus',26,2.4);
 $('icExport').innerHTML=svg('up',20);$('icImport').innerHTML=svg('down',20);
-$('notesSoon').innerHTML=svg('note',40,1.5)+'<div><b>Muistiot tulossa</b><br>Tähän tulevat muistiinpanot, jotka voi liittää suunnitelmiin.</div>';
 $('p4Soon').innerHTML=svg('square',40,1.5)+'<div><b>Paikkamerkki</b><br>Tämän välilehden sisältö päätetään myöhemmin.</div>';
 document.querySelectorAll('[data-soon]').forEach(b=>b.addEventListener('click',()=>toast(b.dataset.soon+' – tulossa pian')));
 
@@ -739,21 +846,258 @@ function closeSheet(){document.activeElement?.blur?.();$('overlay').classList.re
 $('sCancel').onclick=closeSheet;$('overlay').onclick=closeSheet;
 
 
-/* ================= THEME ================= */
-const SKINS=[
-  {id:'kerma',name:'Kerma & metsänvihreä',c:['#1f3a2e','#2f5d46','#f7f3ea']},
-  {id:'sammal',name:'Harmaa & salvia',c:['#2c3a33','#3f7a5c','#f1f2f0']},
-  {id:'espresso',name:'Espresso & kaura',c:['#3a2a20','#8a5a3b','#f6f1ea']},
-  {id:'vuono',name:'Yönsininen & sumu',c:['#26323f','#3f6385','#eef1f3']},
-];
-function applySkin(){
-  const sk=SKINS.find(x=>x.id===state.skin)||SKINS[0];
-  document.documentElement.dataset.skin=sk.id;
-  document.querySelector('meta[name=theme-color]').content=sk.c[0];
-  $('skins').innerHTML=SKINS.map(x=>`<button class="skin ${x===sk?'on':''}" data-skin="${x.id}"><div class="sw">${x.c.map(c=>`<i style="background:${c}"></i>`).join('')}</div><span>${x.name}</span></button>`).join('');
+
+
+/* ================= NOTES ================= */
+if(!Array.isArray(state.notes))state.notes=[];
+if(!Array.isArray(state.links))state.links=[];
+if(!state.notesSeeded){
+  const now=Date.now(),D=864e5;
+  const mk=(id,title,body,x,y,ago,pinned=false)=>({id,title,body,x,y,created:now-ago,updated:now-ago,pinned,demo:true});
+  state.notes.push(
+    mk('demo-a','Projektit','Kaikki käynnissä olevat jutut yhdessä paikassa.',0,0,2*36e5,true),
+    mk('demo-b','Asiakas: kotisivut','- Rakenne valmis\n- Kuvat puuttuu\n- Julkaisu ensi viikolla',-190,-120,5*36e5),
+    mk('demo-c','Videoideat','Lyhyet videot: ennen/jälkeen, asiakkaan tarina, 3 vinkkiä.',190,-110,1.2*D),
+    mk('demo-d','Kuvauslista','Mikrofoni, valot, varavirtalähde.',230,70,3*D),
+    mk('demo-e','Kauppalista','Maito\nKahvi\nKaurahiutaleet\nBanaanit',-170,150,9*D)
+  );
+  state.links.push(['demo-a','demo-b'],['demo-a','demo-c'],['demo-c','demo-d']);
+  state.notesSeeded=true;save();
 }
-$('skins').addEventListener('click',e=>{const b=e.target.closest('[data-skin]');if(!b)return;state.skin=b.dataset.skin;save();applySkin()});
-applySkin();
+const noteById=id=>state.notes.find(n=>n.id===id);
+const firstLine=t=>(t||'').split('\n').map(x=>x.trim()).find(Boolean)||'';
+const noteName=n=>(n.title||'').trim()||firstLine(n.body)||'Uusi muistiinpano';
+const WD_FULL=['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'];
+function shortStamp(ts){
+  const d=new Date(ts),t=new Date(),days=Math.round((parse(ymd(t))-parse(ymd(d)))/864e5);
+  if(days===0)return `${d.getHours()}.${pad(d.getMinutes())}`;
+  if(days===1)return 'eilen';
+  if(days<7)return WD_FULL[d.getDay()];
+  return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+}
+const longStamp=ts=>{const d=new Date(ts);return `${d.getDate()}. ${M_FULL[d.getMonth()]}ta ${d.getFullYear()} klo ${d.getHours()}.${pad(d.getMinutes())}`};
+let notesMode='list',openId=null,connect=false,pickId=null,edSplit=false;
+const nPage=$('page-notes'),mapEl=$('map'),world=$('world'),ed=$('editor');
+$('nCompose').innerHTML=svg('compose',24);
+$('nSearchIc').innerHTML=svg('search',17,2);
+$('tNew').innerHTML=svg('plus',22,2);$('tLink').innerHTML=svg('link',20);$('tFit').innerHTML=svg('fit',20);
+$('edPin').innerHTML=svg('tack',21);$('edDel').innerHTML=svg('trash',21);
+
+/* ---- list ---- */
+function renderNoteList(){
+  const q=$('nSearch').value.trim().toLowerCase();
+  const list=[...state.notes].filter(n=>!q||(n.title+' '+n.body).toLowerCase().includes(q)).sort((a,b)=>b.updated-a.updated);
+  if(!state.notes.length){$('nList').innerHTML='<div class="n-empty">Ei muistiinpanoja.<br>Luo ensimmäinen oikean yläkulman kynästä.</div>';return}
+  if(!list.length){$('nList').innerHTML='<div class="n-empty">Ei tuloksia haulle.</div>';return}
+  const today=parse(ymd(new Date())),groups=new Map();
+  const add=(k,n)=>{if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)};
+  for(const n of list){
+    if(n.pinned&&!q){add('Kiinnitetyt',n);continue}
+    const d=new Date(n.updated),days=Math.round((today-parse(ymd(d)))/864e5);
+    add(days===0?'Tänään':days<=7?'Edelliset 7 päivää':days<=30?'Edelliset 30 päivää':
+      (d.getFullYear()===today.getFullYear()?M_FULL[d.getMonth()]:String(d.getFullYear())),n);
+  }
+  let h='';
+  for(const [k,ns] of groups){
+    h+=`<div class="n-sec">${k==='Kiinnitetyt'?svg('tack',18):''}${k}</div><div class="n-group">`;
+    for(const n of ns){
+      const title=noteName(n),lines=(n.body||'').split('\n').map(x=>x.trim()).filter(Boolean);
+      const prev=(n.title||'').trim()?lines[0]:lines[1];
+      h+=`<button class="n-row" data-note="${n.id}"><div class="t">${esc(title)}</div><div class="s"><b>${shortStamp(n.updated)}</b>${esc(prev||'Ei lisätekstiä')}</div></button>`;
+    }
+    h+='</div>';
+  }
+  h+=`<div class="n-count">${list.length} ${list.length===1?'muistiinpano':'muistiinpanoa'}</div>`;
+  $('nList').innerHTML=h;
+}
+$('nList').addEventListener('click',e=>{const b=e.target.closest('[data-note]');if(b)openNote(b.dataset.note,false)});
+$('nSearch').addEventListener('input',renderNoteList);
+
+/* ---- mode switch ---- */
+function setNotesMode(m){
+  if(openId)closeNote(true);
+  notesMode=m;
+  $('segList').classList.toggle('on',m==='list');$('segMap').classList.toggle('on',m==='map');
+  $('nListWrap').hidden=m!=='list';mapEl.hidden=m!=='map';
+  if(m==='map'){renderMap();requestAnimationFrame(()=>fitMap(false))}else renderNoteList();
+}
+$('nSeg').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b&&b.dataset.mode!==notesMode)setNotesMode(b.dataset.mode)});
+
+/* ---- create ---- */
+function newNote(x,y){
+  const n={id:uid(),title:'',body:'',created:Date.now(),updated:Date.now(),pinned:false,x,y};
+  state.notes.push(n);save();return n;
+}
+function freeSpot(){
+  const c=viewCenter();let best=null;
+  for(let r=0;r<6;r++)for(let a=0;a<8;a++){
+    const x=c.x+Math.cos(a/8*Math.PI*2+r)*r*120,y=c.y+Math.sin(a/8*Math.PI*2+r)*r*80;
+    if(state.notes.every(n=>Math.abs(n.x-x)>150||Math.abs(n.y-y)>56))return {x,y};
+  }
+  return c;
+}
+$('nCompose').onclick=()=>{const p=freeSpot();const n=newNote(p.x,p.y);openNote(n.id,false,true)};
+$('tNew').onclick=()=>{const p=freeSpot();const n=newNote(p.x,p.y);renderMap();openNote(n.id,true,true)};
+
+/* ---- editor ---- */
+let saveT;
+function persist(){clearTimeout(saveT);saveT=setTimeout(save,250)}
+function fillEditor(n){
+  $('edTitle').value=n.title||'';$('edBody').value=n.body||'';
+  $('edDate').textContent=longStamp(n.updated);
+  $('edPin').classList.toggle('on',!!n.pinned);
+  resetDel();renderEdLinks(n);requestAnimationFrame(sizeBody);
+  $('edScroll').scrollTop=0;
+}
+function renderEdLinks(n){
+  const ids=state.links.filter(l=>l.includes(n.id)).map(l=>l[0]===n.id?l[1]:l[0]);
+  $('edLinks').innerHTML=ids.map(i=>noteById(i)).filter(Boolean).map(x=>`<span>${svg('link',12,2.2).replace('<svg','<svg style="display:inline;vertical-align:-1px;margin-right:4px"')}${esc(noteName(x))}</span>`).join('');
+}
+function sizeBody(){const t=$('edBody');t.style.height='auto';t.style.height=Math.max(200,t.scrollHeight)+'px'}
+function openNote(id,split,focus){
+  const n=noteById(id);if(!n)return;
+  if(openId&&openId!==id)cleanupEmpty(openId);
+  const already=ed.classList.contains('open')&&edSplit===split;
+  openId=id;fillEditor(n);
+  if(!already){
+    ed.style.transition='none';ed.classList.remove('open');ed.classList.toggle('split',split);void ed.offsetWidth;ed.style.transition='';
+    edSplit=split;$('edBackTx').textContent=split?'Sulje':'Muistiot';
+    $('edBackIc').innerHTML=svg(split?'chev':'left',22,2.2);
+    requestAnimationFrame(()=>ed.classList.add('open'));
+  }
+  if(split){
+    if(!nPage.classList.contains('split')){savedView={...view};nPage.classList.add('split');mapEl.classList.add('split');
+      setTimeout(()=>fitMap(true),360)}
+    markSel();
+  }
+  if(focus)setTimeout(()=>$('edTitle').focus(),380);
+}
+function cleanupEmpty(id){
+  const n=noteById(id);
+  if(n&&!(n.title||'').trim()&&!(n.body||'').trim()){state.notes=state.notes.filter(x=>x.id!==id);state.links=state.links.filter(l=>!l.includes(id));save();return true}
+  return false;
+}
+function closeNote(instant){
+  document.activeElement?.blur?.();
+  const id=openId;openId=null;cleanupEmpty(id);save();
+  if(instant){ed.style.transition='none';ed.classList.remove('open');void ed.offsetWidth;ed.style.transition=''}
+  else ed.classList.remove('open');
+  if(nPage.classList.contains('split')){
+    nPage.classList.remove('split');mapEl.classList.remove('split');
+    if(savedView){view=savedView;savedView=null;setTimeout(()=>applyView(true),40)}
+  }
+  if(notesMode==='map'){renderMap()}else renderNoteList();
+}
+$('edBack').onclick=()=>closeNote(false);
+$('edTitle').addEventListener('input',e=>{const n=noteById(openId);if(!n)return;n.title=e.target.value;n.updated=Date.now();persist();updateNodeLabel(n)});
+$('edBody').addEventListener('input',e=>{const n=noteById(openId);if(!n)return;n.body=e.target.value;n.updated=Date.now();persist();sizeBody();updateNodeLabel(n)});
+$('edTitle').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('edBody').focus()}});
+ed.addEventListener('focusin',()=>{$('edDone').hidden=false;$('edPin').hidden=$('edDel').hidden=true});
+ed.addEventListener('focusout',()=>setTimeout(()=>{if(!ed.contains(document.activeElement)){$('edDone').hidden=true;$('edPin').hidden=$('edDel').hidden=false}},0));
+$('edDone').onclick=()=>document.activeElement?.blur?.();
+$('edPin').onclick=()=>{const n=noteById(openId);if(!n)return;n.pinned=!n.pinned;save();$('edPin').classList.toggle('on',n.pinned);toast(n.pinned?'Kiinnitetty':'Kiinnitys poistettu')};
+let delArmedN=false;
+function resetDel(){delArmedN=false;$('edDel').classList.remove('confirm')}
+$('edDel').onclick=()=>{
+  if(!delArmedN){delArmedN=true;$('edDel').classList.add('confirm');toast('Napauta roskakoria uudelleen poistaaksesi');setTimeout(resetDel,3000);return}
+  const id=openId;state.notes=state.notes.filter(x=>x.id!==id);state.links=state.links.filter(l=>!l.includes(id));
+  openId=null;save();closeNote(false);toast('Muistiinpano poistettu');
+};
+
+/* ---- mind map ---- */
+let view={x:0,y:0,k:1},savedView=null;
+function applyView(anim){world.style.transition=anim?'transform .4s cubic-bezier(.3,.7,.2,1)':'none';world.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.k})`}
+function viewCenter(){const r=mapEl.getBoundingClientRect();const w=r.width||innerWidth,h=r.height||innerHeight*.6;return {x:(w/2-view.x)/view.k,y:(h/2-view.y)/view.k}}
+function ensurePositions(){
+  let i=0;for(const n of state.notes){if(typeof n.x!=='number'||typeof n.y!=='number'){const a=i*2.4;n.x=Math.cos(a)*(150+i*25);n.y=Math.sin(a)*(110+i*18);i++}}
+}
+function linkCount(id){return state.links.filter(l=>l.includes(id)).length}
+function renderMap(){
+  ensurePositions();
+  const maxL=Math.max(0,...state.notes.map(n=>linkCount(n.id)));
+  $('nodes').innerHTML=state.notes.map(n=>`<button class="node ${maxL>1&&linkCount(n.id)===maxL?'root':''}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px">${esc(noteName(n))}</button>`).join('');
+  drawLinks();markSel();
+}
+function drawLinks(){
+  $('links').innerHTML=state.links.map(([a,b])=>{const A=noteById(a),B=noteById(b);if(!A||!B)return'';
+    const mx=(A.x+B.x)/2,my=(A.y+B.y)/2,dx=B.x-A.x,dy=B.y-A.y,c=.12;
+    return `<path d="M${A.x} ${A.y} Q${mx-dy*c} ${my+dx*c} ${B.x} ${B.y}"/>`}).join('');
+}
+function markSel(){$('nodes').querySelectorAll('.node').forEach(el=>{el.classList.toggle('sel',el.dataset.id===openId&&edSplit);el.classList.toggle('pick',el.dataset.id===pickId)})}
+function updateNodeLabel(n){const el=$('nodes').querySelector(`[data-id="${n.id}"]`);if(el)el.textContent=noteName(n);renderEdLinks(n)}
+function fitMap(anim){
+  const r=mapEl.getBoundingClientRect();if(!r.width||!state.notes.length){view={x:r.width/2,y:r.height/2,k:1};applyView(anim);return}
+  const xs=state.notes.map(n=>n.x),ys=state.notes.map(n=>n.y);
+  const minX=Math.min(...xs)-70,maxX=Math.max(...xs)+70,minY=Math.min(...ys)-24,maxY=Math.max(...ys)+24;
+  const padTop=edSplit&&openId?50:20;
+  const k=Math.max(.3,Math.min(1.15,(r.width-24)/(maxX-minX),(r.height-padTop-20)/(maxY-minY)));
+  view={k,x:r.width/2-(minX+maxX)/2*k,y:padTop+(r.height-padTop-20)/2-(minY+maxY)/2*k};
+  applyView(anim);
+}
+$('tFit').onclick=()=>fitMap(true);
+$('tLink').onclick=()=>{connect=!connect;pickId=null;$('tLink').classList.toggle('on',connect);$('mapHint').hidden=!connect;markSel()};
+function toggleLink(a,b){
+  const i=state.links.findIndex(l=>l.includes(a)&&l.includes(b));
+  if(i>=0){state.links.splice(i,1);toast('Yhteys poistettu')}else{state.links.push([a,b]);toast('Yhdistetty')}
+  save();renderMap();const n=noteById(openId);if(n)renderEdLinks(n);
+}
+function nodeTap(id){
+  if(connect){
+    if(!pickId){pickId=id}else if(pickId===id){pickId=null}else{toggleLink(pickId,id);pickId=null}
+    markSel();return;
+  }
+  openNote(id,true);
+}
+/* gestures: drag node, pan, pinch */
+const ptrs=new Map();let gest=null;
+const rel=e=>{const r=mapEl.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+mapEl.addEventListener('pointerdown',e=>{
+  if(e.target.closest('.map-tools'))return;
+  e.preventDefault();
+  try{mapEl.setPointerCapture(e.pointerId)}catch(_){}
+  ptrs.set(e.pointerId,rel(e));
+  if(ptrs.size===1){
+    const nodeEl=e.target.closest('.node'),p=rel(e);
+    if(nodeEl){const n=noteById(nodeEl.dataset.id);gest={t:'node',id:n.id,el:nodeEl,sx:p.x,sy:p.y,ox:n.x,oy:n.y,moved:false}}
+    else gest={t:'pan',sx:p.x,sy:p.y,vx:view.x,vy:view.y,moved:false};
+  }else if(ptrs.size===2){
+    if(gest&&gest.t==='node'&&gest.moved){const n=noteById(gest.id);n.x=gest.ox;n.y=gest.oy;gest.el.style.left=n.x+'px';gest.el.style.top=n.y+'px';gest.el.classList.remove('dragging');drawLinks()}
+    const [a,b]=[...ptrs.values()];
+    gest={t:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,k0:view.k,wx:((a.x+b.x)/2-view.x)/view.k,wy:((a.y+b.y)/2-view.y)/view.k};
+  }
+});
+mapEl.addEventListener('pointermove',e=>{
+  if(!ptrs.has(e.pointerId)||!gest)return;
+  const p=rel(e);ptrs.set(e.pointerId,p);
+  if(gest.t==='pinch'&&ptrs.size>=2){
+    const [a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y);
+    const k=Math.max(.25,Math.min(2.5,gest.k0*d/gest.d0)),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    view={k,x:mx-gest.wx*k,y:my-gest.wy*k};applyView(false);return;
+  }
+  const dx=p.x-gest.sx,dy=p.y-gest.sy;
+  if(!gest.moved&&Math.hypot(dx,dy)>6){gest.moved=true;if(gest.t==='node')gest.el.classList.add('dragging')}
+  if(!gest.moved)return;
+  if(gest.t==='node'){const n=noteById(gest.id);n.x=gest.ox+dx/view.k;n.y=gest.oy+dy/view.k;gest.el.style.left=n.x+'px';gest.el.style.top=n.y+'px';drawLinks()}
+  else if(gest.t==='pan'){view.x=gest.vx+dx;view.y=gest.vy+dy;applyView(false)}
+});
+function endPtr(e){
+  if(!ptrs.has(e.pointerId))return;
+  ptrs.delete(e.pointerId);
+  if(!gest)return;
+  if(gest.t==='node'){
+    gest.el.classList.remove('dragging');
+    if(gest.moved)save();else if(e.type==='pointerup')nodeTap(gest.id);
+    gest=null;
+  }else if(gest.t==='pan'){
+    if(!gest.moved&&e.type==='pointerup'&&connect&&pickId){pickId=null;markSel()}
+    gest=null;
+  }else if(gest.t==='pinch'&&ptrs.size<2){gest=null}
+}
+mapEl.addEventListener('pointerup',endPtr);mapEl.addEventListener('pointercancel',endPtr);
+mapEl.addEventListener('wheel',e=>{e.preventDefault();const p=rel(e),k=Math.max(.25,Math.min(2.5,view.k*Math.exp(-e.deltaY*.0015)));
+  const wx=(p.x-view.x)/view.k,wy=(p.y-view.y)/view.k;view={k,x:p.x-wx*k,y:p.y-wy*k};applyView(false)},{passive:false});
+
+function renderNotes(){if(notesMode==='map'){renderMap();if(!openId)requestAnimationFrame(()=>fitMap(false))}else renderNoteList()}
 
 /* ================= SETTINGS ================= */
 $('nameInput').addEventListener('input',e=>{state.name=e.target.value;save();renderHome()});
@@ -780,7 +1124,7 @@ $('wipeBtn').onclick=()=>{
     setTimeout(()=>{wipeArmed=false;$('wipeBtn').querySelector('span').textContent='Poista kaikki suunnitelmat'},3000);return}
   state.plans=[];save();refresh();toast('Kaikki suunnitelmat poistettu');
 };
-$('demoBtn').onclick=()=>{state.plans=state.plans.filter(p=>!p.demo);save();refresh();toast('Esimerkit poistettu')};
+$('demoBtn').onclick=()=>{state.plans=state.plans.filter(p=>!p.demo);const gone=new Set(state.notes.filter(n=>n.demo).map(n=>n.id));state.notes=state.notes.filter(n=>!n.demo);state.links=state.links.filter(l=>!gone.has(l[0])&&!gone.has(l[1]));save();refresh();toast('Esimerkit poistettu')};
 const standalone=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;
 if(standalone){$('installLabel').hidden=true;$('installHint').hidden=true}
 
@@ -795,7 +1139,9 @@ function go(page){
     renderCal();requestAnimationFrame(()=>{scrollAgendaTo(selDate);updateTopTitle()});
   }
   if(page==='home')renderHome();
-  if(page==='more'){$('nameInput').value=state.name||'';$('demoBtn').hidden=!state.plans.some(p=>p.demo)}
+  if(page==='notes')renderNotes();
+  if(page!=='notes'&&openId)closeNote(true);
+  if(page==='more'){$('nameInput').value=state.name||'';$('demoBtn').hidden=!(state.plans.some(p=>p.demo)||state.notes.some(n=>n.demo))}
 }
 $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;
   if(b.dataset.page==='cal'&&currentPage!=='cal'){/* keep last mode */}
@@ -805,7 +1151,7 @@ function refresh(){
   index();renderHome();
   if(currentPage==='cal'){const sc=$('agendaScroll'),y=sc.scrollTop;
     if(mode==='list'){renderCal();sc.scrollTop=y}else renderCal()}
-  if(currentPage==='more')$('demoBtn').hidden=!state.plans.some(p=>p.demo);
+  if(currentPage==='more')$('demoBtn').hidden=!(state.plans.some(p=>p.demo)||state.notes.some(n=>n.demo));
 }
 
 /* first run: ask for name */
