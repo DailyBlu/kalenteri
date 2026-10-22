@@ -179,7 +179,7 @@ svg{display:block;flex:none}
 .n-head h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.5px}
 .compose{color:var(--accent)}
 #page-notes.split .n-head{display:none}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);border-radius:9px;padding:2px}
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--bg2);border-radius:9px;padding:2px}
 .seg button{height:30px;font-size:13.5px;font-weight:600;border-radius:7px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(var(--shade),.16)}
 .n-body{flex:1;position:relative;min-height:0}
@@ -217,11 +217,22 @@ svg{display:block;flex:none}
 .tool{width:42px;height:42px;border-radius:12px;background:var(--card);box-shadow:0 2px 8px rgba(var(--shade),.12),0 0 0 1px var(--line);display:grid;place-items:center;color:var(--ink2)}
 .tool.on{background:var(--accent);color:#fff}
 .tool:active{transform:scale(.94)}
-.map.split .map-tools{top:8px;flex-direction:row}
-.map.split .map-tools .tool{width:36px;height:36px}
+.map.split .map-tools,.graph.split .map-tools{top:8px;flex-direction:row}
+.map.split .map-tools .tool,.graph.split .map-tools .tool{width:36px;height:36px}
 .map-hint{position:absolute;left:12px;top:12px;max-width:calc(100% - 80px);background:var(--ink);color:var(--card);font-size:13px;padding:8px 12px;border-radius:10px;z-index:4}
 .map.split .map-hint{display:none}
 
+ .graph{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;touch-action:none;background:var(--top);transition:bottom .34s cubic-bezier(.3,.7,.2,1)}
+.graph.split{bottom:65%}
+.graph canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.g-legend{position:absolute;left:14px;right:70px;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);color:rgba(240,236,226,.6);font-size:12px;line-height:1.5;pointer-events:none}
+.g-legend code{font-family:ui-monospace,Menlo,monospace;color:rgba(240,236,226,.85)}
+.graph.split .g-legend{display:none}
+.links path.wiki{stroke-dasharray:5 5}
+.ed-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.ed-tags:empty{display:none}
+.ed-tags span{font-size:13.5px;font-weight:600;padding:3px 10px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
+.ed-links button{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--bg2);color:var(--ink2);font-weight:600;display:inline-flex;align-items:center;gap:4px}
 .editor{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--card);z-index:12;display:flex;flex-direction:column;
   transform:translateX(100%);transition:transform .34s cubic-bezier(.3,.7,.2,1)}
 .editor.open{transform:none}
@@ -360,6 +371,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <div class="seg" id="nSeg">
       <button data-mode="list" class="on" id="segList">Lista</button>
       <button data-mode="map" id="segMap">Mielikartta</button>
+      <button data-mode="graph" id="segGraph">Graafi</button>
     </div>
   </div>
   <div class="n-body">
@@ -377,6 +389,14 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
         <button class="tool" id="tFit" aria-label="Sovita näkymä"></button>
       </div>
     </div>
+    <div class="graph" id="graph" hidden>
+      <canvas id="gCanvas"></canvas>
+      <div class="g-legend">Viivat tulevat mielikartan yhteyksistä ja linkeistä <code>[[Muistion nimi]]</code>. Pisteen väri tulee ensimmäisestä <code>#tunnisteesta</code>.</div>
+      <div class="map-tools">
+        <button class="tool" id="gNew" aria-label="Uusi muistiinpano"></button>
+        <button class="tool" id="gFit" aria-label="Sovita näkymä"></button>
+      </div>
+    </div>
   </div>
   <div class="editor" id="editor">
     <div class="n-band"></div>
@@ -392,7 +412,8 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <div class="ed-scroll" id="edScroll">
       <div class="ed-date" id="edDate"></div>
       <input id="edTitle" placeholder="Otsikko" autocomplete="off" maxlength="120">
-      <textarea id="edBody" placeholder="Kirjoita muistiinpano…"></textarea>
+      <div class="ed-tags" id="edTags"></div>
+      <textarea id="edBody" placeholder="Kirjoita muistiinpano…&#10;&#10;Vinkki: [[Muistion nimi]] linkittää muistioon, #tunniste lisää tunnisteen."></textarea>
       <div class="ed-links" id="edLinks"></div>
     </div>
   </div>
@@ -422,7 +443,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.3</p>
+    <p class="hint" style="margin-top:24px">Versio 0.4</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -864,6 +885,19 @@ if(!state.notesSeeded){
   state.links.push(['demo-a','demo-b'],['demo-a','demo-c'],['demo-c','demo-d']);
   state.notesSeeded=true;save();
 }
+if(state.notesSeeded===true){
+  if(state.notes.some(n=>n.demo)){
+    const now=Date.now(),D=864e5;
+    const mk=(id,title,body,x,y,ago)=>({id,title,body,x,y,created:now-ago,updated:now-ago,pinned:false,demo:true});
+    state.notes.push(
+      mk('demo-f','Sisältökalenteri','Julkaisu kerran viikossa.\nKatso [[Videoideat]] ja [[Kuvauslista]].\n#markkinointi',40,-230,6*36e5),
+      mk('demo-g','Hinnoittelu','Paketit: perus, laaja, ylläpito.\nLiittyy: [[Asiakas: kotisivut]]\n#yritys',-260,10,2*D),
+      mk('demo-h','Asiakaslista','Seuraavat soitot ja tarjoukset.\n[[Hinnoittelu]] [[Projektit]]\n#yritys',-330,-150,4*D),
+      mk('demo-i','Treeniohjelma','Ma, ke, pe: sali.\n#oma',-20,230,12*D)
+    );
+  }
+  state.notesSeeded=2;save();
+}
 const noteById=id=>state.notes.find(n=>n.id===id);
 const firstLine=t=>(t||'').split('\n').map(x=>x.trim()).find(Boolean)||'';
 const noteName=n=>(n.title||'').trim()||firstLine(n.body)||'Uusi muistiinpano';
@@ -917,9 +951,11 @@ $('nSearch').addEventListener('input',renderNoteList);
 function setNotesMode(m){
   if(openId)closeNote(true);
   notesMode=m;
-  $('segList').classList.toggle('on',m==='list');$('segMap').classList.toggle('on',m==='map');
-  $('nListWrap').hidden=m!=='list';mapEl.hidden=m!=='map';
-  if(m==='map'){renderMap();requestAnimationFrame(()=>fitMap(false))}else renderNoteList();
+  [['list','segList'],['map','segMap'],['graph','segGraph']].forEach(([k,i])=>$(i).classList.toggle('on',m===k));
+  $('nListWrap').hidden=m!=='list';mapEl.hidden=m!=='map';graphEl.hidden=m!=='graph';
+  if(m==='map'){renderMap();requestAnimationFrame(()=>fitMap(false))}
+  else if(m==='graph'){requestAnimationFrame(()=>{sizeCanvas();rebuildGraph(true);fitGraph(false)})}
+  else renderNoteList();
 }
 $('nSeg').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b&&b.dataset.mode!==notesMode)setNotesMode(b.dataset.mode)});
 
@@ -949,9 +985,24 @@ function fillEditor(n){
   resetDel();renderEdLinks(n);requestAnimationFrame(sizeBody);
   $('edScroll').scrollTop=0;
 }
+function wikiTargets(n){
+  const out=[],re=/\[\[([^\]\n]+)\]\]/g;let m;
+  while((m=re.exec(n.body||''))){const name=m[1].split('|')[0].trim().toLowerCase();
+    const t=state.notes.find(x=>x!==n&&noteName(x).toLowerCase()===name);if(t)out.push(t.id)}
+  return out;
+}
+function allEdges(){
+  const seen=new Set(),out=[];
+  const add=(a,b,w)=>{const k=a<b?a+'|'+b:b+'|'+a;if(seen.has(k))return;seen.add(k);out.push([a,b,w])};
+  state.links.forEach(([a,b])=>add(a,b,false));
+  state.notes.forEach(n=>wikiTargets(n).forEach(t=>add(n.id,t,true)));
+  return out;
+}
+function tagsOf(n){return [...new Set([...((n.title||'')+' '+(n.body||'')).matchAll(/(?:^|\s)#([\p{L}\p{N}_\-\/]+)/gu)].map(m=>m[1].toLowerCase()))]}
 function renderEdLinks(n){
-  const ids=state.links.filter(l=>l.includes(n.id)).map(l=>l[0]===n.id?l[1]:l[0]);
-  $('edLinks').innerHTML=ids.map(i=>noteById(i)).filter(Boolean).map(x=>`<span>${svg('link',12,2.2).replace('<svg','<svg style="display:inline;vertical-align:-1px;margin-right:4px"')}${esc(noteName(x))}</span>`).join('');
+  const ids=[...new Set(allEdges().filter(e=>e[0]===n.id||e[1]===n.id).map(e=>e[0]===n.id?e[1]:e[0]))];
+  $('edLinks').innerHTML=ids.map(i=>noteById(i)).filter(Boolean).map(x=>`<button data-go="${x.id}">${svg('link',12,2.2)}${esc(noteName(x))}</button>`).join('');
+  $('edTags').innerHTML=tagsOf(n).map(t=>`<span>#${esc(t)}</span>`).join('');
 }
 function sizeBody(){const t=$('edBody');t.style.height='auto';t.style.height=Math.max(200,t.scrollHeight)+'px'}
 function openNote(id,split,focus){
@@ -966,9 +1017,11 @@ function openNote(id,split,focus){
     requestAnimationFrame(()=>ed.classList.add('open'));
   }
   if(split){
-    if(!nPage.classList.contains('split')){savedView={...view};nPage.classList.add('split');mapEl.classList.add('split');
-      setTimeout(()=>fitMap(true),360)}
-    markSel();
+    if(!nPage.classList.contains('split')){
+      if(notesMode==='graph'){savedG={...gView};graphEl.classList.add('split')}else{savedView={...view};mapEl.classList.add('split')}
+      nPage.classList.add('split');
+      setTimeout(()=>notesMode==='graph'?fitGraph(true):fitMap(true),360)}
+    markSel();gSel=id;drawGraph();
   }
   if(focus)setTimeout(()=>$('edTitle').focus(),380);
 }
@@ -983,14 +1036,17 @@ function closeNote(instant){
   if(instant){ed.style.transition='none';ed.classList.remove('open');void ed.offsetWidth;ed.style.transition=''}
   else ed.classList.remove('open');
   if(nPage.classList.contains('split')){
-    nPage.classList.remove('split');mapEl.classList.remove('split');
+    nPage.classList.remove('split');mapEl.classList.remove('split');graphEl.classList.remove('split');
     if(savedView){view=savedView;savedView=null;setTimeout(()=>applyView(true),40)}
+    if(savedG){const t=savedG;savedG=null;setTimeout(()=>animateG(t),40)}
   }
-  if(notesMode==='map'){renderMap()}else renderNoteList();
+  gSel=null;
+  if(notesMode==='map')renderMap();else if(notesMode==='graph')rebuildGraph(false);else renderNoteList();
 }
 $('edBack').onclick=()=>closeNote(false);
-$('edTitle').addEventListener('input',e=>{const n=noteById(openId);if(!n)return;n.title=e.target.value;n.updated=Date.now();persist();updateNodeLabel(n)});
-$('edBody').addEventListener('input',e=>{const n=noteById(openId);if(!n)return;n.body=e.target.value;n.updated=Date.now();persist();sizeBody();updateNodeLabel(n)});
+$('edLinks').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)openNote(b.dataset.go,edSplit)});
+$('edTitle').addEventListener('input',e=>{const n=noteById(openId);if(!n)return;n.title=e.target.value;n.updated=Date.now();persist();updateNodeLabel(n);if(notesMode==='graph')scheduleGraph()});
+$('edBody').addEventListener('input',e=>{const n=noteById(openId);if(!n)return;n.body=e.target.value;n.updated=Date.now();persist();sizeBody();updateNodeLabel(n);if(notesMode==='graph')scheduleGraph()});
 $('edTitle').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('edBody').focus()}});
 ed.addEventListener('focusin',()=>{$('edDone').hidden=false;$('edPin').hidden=$('edDel').hidden=true});
 ed.addEventListener('focusout',()=>setTimeout(()=>{if(!ed.contains(document.activeElement)){$('edDone').hidden=true;$('edPin').hidden=$('edDel').hidden=false}},0));
@@ -1019,9 +1075,9 @@ function renderMap(){
   drawLinks();markSel();
 }
 function drawLinks(){
-  $('links').innerHTML=state.links.map(([a,b])=>{const A=noteById(a),B=noteById(b);if(!A||!B)return'';
+  $('links').innerHTML=allEdges().map(([a,b,w])=>{const A=noteById(a),B=noteById(b);if(!A||!B)return'';
     const mx=(A.x+B.x)/2,my=(A.y+B.y)/2,dx=B.x-A.x,dy=B.y-A.y,c=.12;
-    return `<path d="M${A.x} ${A.y} Q${mx-dy*c} ${my+dx*c} ${B.x} ${B.y}"/>`}).join('');
+    return `<path class="${w?'wiki':''}" d="M${A.x} ${A.y} Q${mx-dy*c} ${my+dx*c} ${B.x} ${B.y}"/>`}).join('');
 }
 function markSel(){$('nodes').querySelectorAll('.node').forEach(el=>{el.classList.toggle('sel',el.dataset.id===openId&&edSplit);el.classList.toggle('pick',el.dataset.id===pickId)})}
 function updateNodeLabel(n){const el=$('nodes').querySelector(`[data-id="${n.id}"]`);if(el)el.textContent=noteName(n);renderEdLinks(n)}
@@ -1097,7 +1153,113 @@ mapEl.addEventListener('pointerup',endPtr);mapEl.addEventListener('pointercancel
 mapEl.addEventListener('wheel',e=>{e.preventDefault();const p=rel(e),k=Math.max(.25,Math.min(2.5,view.k*Math.exp(-e.deltaY*.0015)));
   const wx=(p.x-view.x)/view.k,wy=(p.y-view.y)/view.k;view={k,x:p.x-wx*k,y:p.y-wy*k};applyView(false)},{passive:false});
 
-function renderNotes(){if(notesMode==='map'){renderMap();if(!openId)requestAnimationFrame(()=>fitMap(false))}else renderNoteList()}
+
+/* ---- graph (Obsidian-style) ---- */
+const graphEl=$('graph'),gCanvas=$('gCanvas');
+let gNodes=new Map(),gEdges=[],gDeg=new Map(),gView={x:0,y:0,k:1},gSel=null,savedG=null,alpha=0,gRaf=null,gDrag=false,gT=null;
+const G_TAG=['#7fd19a','#e0b85a','#e39a7a','#9cc0ea','#c3a6e6','#7fd1cf'];
+const G_PLAIN='#e9e4d8';
+$('gNew').innerHTML=svg('plus',22,2);$('gFit').innerHTML=svg('fit',20);
+function tagColor(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;return G_TAG[h%G_TAG.length]}
+function gColor(id){const n=noteById(id);const t=n&&tagsOf(n)[0];return t?tagColor(t):G_PLAIN}
+function gRadius(id){return 4.5+Math.sqrt(gDeg.get(id)||0)*3}
+function sizeCanvas(){const r=graphEl.getBoundingClientRect(),d=devicePixelRatio||1;if(!r.width)return;gCanvas.width=Math.round(r.width*d);gCanvas.height=Math.round(r.height*d)}
+new ResizeObserver(()=>{if(!graphEl.hidden){sizeCanvas();drawGraph()}}).observe(graphEl);
+function scheduleGraph(){clearTimeout(gT);gT=setTimeout(()=>rebuildGraph(false),400)}
+function rebuildGraph(settle){
+  const ids=new Set(state.notes.map(n=>n.id));
+  for(const id of [...gNodes.keys()])if(!ids.has(id))gNodes.delete(id);
+  let i=gNodes.size,fresh=0;
+  for(const n of state.notes)if(!gNodes.has(n.id)){const a=i*2.399,r=28*Math.sqrt(i+1);gNodes.set(n.id,{id:n.id,x:Math.cos(a)*r,y:Math.sin(a)*r,vx:0,vy:0,fx:null,fy:null});i++;fresh++}
+  gEdges=allEdges().filter(([a,b])=>gNodes.has(a)&&gNodes.has(b));
+  gDeg=new Map();for(const [a,b] of gEdges){gDeg.set(a,(gDeg.get(a)||0)+1);gDeg.set(b,(gDeg.get(b)||0)+1)}
+  if(settle&&fresh){alpha=1;for(let t=0;t<220;t++)tick()}
+  kick(settle?.12:.35);drawGraph();
+}
+function tick(){
+  const ns=[...gNodes.values()];
+  for(let i=0;i<ns.length;i++){const a=ns[i];for(let j=i+1;j<ns.length;j++){const b=ns[j];
+    let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;if(d2<1){dx=Math.random()-.5;dy=Math.random()-.5;d2=1}
+    if(d2>360000)continue;const d=Math.sqrt(d2),f=1600*alpha/d2,fx=dx/d*f,fy=dy/d*f;a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy}}
+  for(const [ai,bi] of gEdges){const a=gNodes.get(ai),b=gNodes.get(bi);const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-75)*.05*alpha,fx=dx/d*f,fy=dy/d*f;a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy}
+  for(const n of ns){if(n.fx!=null){n.x=n.fx;n.y=n.fy;n.vx=n.vy=0;continue}
+    n.vx-=n.x*.012*alpha;n.vy-=n.y*.012*alpha;n.vx*=.62;n.vy*=.62;n.x+=n.vx;n.y+=n.vy}
+  alpha*=.985;
+}
+function kick(a){alpha=Math.max(alpha,a);if(!gRaf&&!graphEl.hidden)gRaf=requestAnimationFrame(loop)}
+function loop(){gRaf=null;if(graphEl.hidden)return;tick();drawGraph();if(alpha>.015||gDrag)gRaf=requestAnimationFrame(loop)}
+function gNeighbors(id){const s=new Set([id]);for(const [a,b] of gEdges){if(a===id)s.add(b);if(b===id)s.add(a)}return s}
+function drawGraph(){
+  if(graphEl.hidden||!gCanvas.width)return;
+  const ctx=gCanvas.getContext('2d'),d=devicePixelRatio||1,W=gCanvas.width/d,H=gCanvas.height/d,k=gView.k;
+  ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,W,H);
+  const nb=gSel&&gNodes.has(gSel)?gNeighbors(gSel):null;
+  ctx.setTransform(d*k,0,0,d*k,d*gView.x,d*gView.y);
+  for(const [a,b,w] of gEdges){const A=gNodes.get(a),B=gNodes.get(b),hi=nb&&(a===gSel||b===gSel);
+    ctx.strokeStyle=hi?'rgba(127,209,154,.85)':nb?'rgba(233,228,216,.08)':'rgba(233,228,216,.26)';
+    ctx.lineWidth=(hi?1.8:1.1)/k;ctx.setLineDash(w?[4/k,4/k]:[]);
+    ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke()}
+  ctx.setLineDash([]);
+  for(const n of gNodes.values()){const dim=nb&&!nb.has(n.id);ctx.globalAlpha=dim?.22:1;
+    const r=gRadius(n.id);ctx.fillStyle=n.id===gSel?'#ffffff':gColor(n.id);
+    ctx.beginPath();ctx.arc(n.x,n.y,n.id===gSel?r+1.5:r,0,Math.PI*2);ctx.fill()}
+  ctx.globalAlpha=1;ctx.setTransform(d,0,0,d,0,0);
+  ctx.font='500 11.5px -apple-system,BlinkMacSystemFont,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+  const maxDeg=Math.max(1,...gDeg.values());
+  for(const n of gNodes.values()){
+    const show=k>.9||(nb&&nb.has(n.id))||(gDeg.get(n.id)||0)>=Math.max(2,maxDeg);
+    if(!show)continue;const note=noteById(n.id);if(!note)continue;
+    let t=noteName(note);if(t.length>24)t=t.slice(0,23)+'…';
+    const dim=nb&&!nb.has(n.id);ctx.fillStyle=dim?'rgba(240,236,226,.25)':n.id===gSel?'#ffffff':'rgba(240,236,226,.82)';
+    ctx.fillText(t,n.x*k+gView.x,n.y*k+gView.y+gRadius(n.id)*k+5);
+  }
+}
+function animateG(t){const s={...gView},t0=performance.now();
+  const step=now=>{const e=Math.min(1,(now-t0)/380),q=1-Math.pow(1-e,3);gView={x:s.x+(t.x-s.x)*q,y:s.y+(t.y-s.y)*q,k:s.k+(t.k-s.k)*q};drawGraph();if(e<1)requestAnimationFrame(step)};
+  requestAnimationFrame(step)}
+function fitGraph(anim){
+  const r=graphEl.getBoundingClientRect();if(!r.width)return;
+  const ns=[...gNodes.values()];
+  if(!ns.length){gView={x:r.width/2,y:r.height/2,k:1};drawGraph();return}
+  const xs=ns.map(n=>n.x),ys=ns.map(n=>n.y);
+  const minX=Math.min(...xs)-50,maxX=Math.max(...xs)+50,minY=Math.min(...ys)-30,maxY=Math.max(...ys)+45;
+  const split=nPage.classList.contains('split'),top=split?52:16,bottom=split?10:110;
+  const k=Math.max(.2,Math.min(1.6,(r.width-20)/(maxX-minX),(r.height-top-bottom)/(maxY-minY)));
+  const t={k,x:r.width/2-(minX+maxX)/2*k,y:top+(r.height-top-bottom)/2-(minY+maxY)/2*k};
+  if(anim)animateG(t);else{gView=t;drawGraph()}
+}
+$('gFit').onclick=()=>fitGraph(true);
+$('gNew').onclick=()=>{const n=newNote(0,0);const p=freeSpot();n.x=p.x;n.y=p.y;save();rebuildGraph(false);openNote(n.id,true,true)};
+const gp=new Map();let gg=null;
+const grel=e=>{const r=graphEl.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+function gHit(p){const wx=(p.x-gView.x)/gView.k,wy=(p.y-gView.y)/gView.k;let best=null,bd=1e9;
+  for(const n of gNodes.values()){const dd=Math.hypot(n.x-wx,n.y-wy);if(dd<gRadius(n.id)+16/gView.k&&dd<bd){bd=dd;best=n}}return best}
+graphEl.addEventListener('pointerdown',e=>{
+  if(e.target.closest('.map-tools'))return;e.preventDefault();
+  try{graphEl.setPointerCapture(e.pointerId)}catch(_){}
+  const p=grel(e);gp.set(e.pointerId,p);
+  if(gp.size===1){const n=gHit(p);gg=n?{t:'node',n,sx:p.x,sy:p.y,moved:false}:{t:'pan',sx:p.x,sy:p.y,vx:gView.x,vy:gView.y,moved:false}}
+  else if(gp.size===2){if(gg&&gg.t==='node'){gg.n.fx=gg.n.fy=null;gDrag=false}
+    const [a,b]=[...gp.values()];gg={t:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,k0:gView.k,wx:((a.x+b.x)/2-gView.x)/gView.k,wy:((a.y+b.y)/2-gView.y)/gView.k}}
+});
+graphEl.addEventListener('pointermove',e=>{
+  if(!gp.has(e.pointerId)||!gg)return;const p=grel(e);gp.set(e.pointerId,p);
+  if(gg.t==='pinch'&&gp.size>=2){const [a,b]=[...gp.values()],dd=Math.hypot(a.x-b.x,a.y-b.y),k=Math.max(.2,Math.min(3,gg.k0*dd/gg.d0));
+    gView={k,x:(a.x+b.x)/2-gg.wx*k,y:(a.y+b.y)/2-gg.wy*k};drawGraph();return}
+  const dx=p.x-gg.sx,dy=p.y-gg.sy;if(!gg.moved&&Math.hypot(dx,dy)>6)gg.moved=true;if(!gg.moved)return;
+  if(gg.t==='node'){gg.n.fx=(p.x-gView.x)/gView.k;gg.n.fy=(p.y-gView.y)/gView.k;gDrag=true;kick(.3)}
+  else if(gg.t==='pan'){gView.x=gg.vx+dx;gView.y=gg.vy+dy;drawGraph()}
+});
+function gEnd(e){
+  if(!gp.has(e.pointerId))return;gp.delete(e.pointerId);if(!gg)return;
+  if(gg.t==='node'){gg.n.fx=gg.n.fy=null;gDrag=false;if(!gg.moved&&e.type==='pointerup')openNote(gg.n.id,true);gg=null}
+  else if(gg.t==='pan')gg=null;else if(gp.size<2)gg=null;
+}
+graphEl.addEventListener('pointerup',gEnd);graphEl.addEventListener('pointercancel',gEnd);
+graphEl.addEventListener('wheel',e=>{e.preventDefault();const p=grel(e),k=Math.max(.2,Math.min(3,gView.k*Math.exp(-e.deltaY*.0015)));
+  const wx=(p.x-gView.x)/gView.k,wy=(p.y-gView.y)/gView.k;gView={k,x:p.x-wx*k,y:p.y-wy*k};drawGraph()},{passive:false});
+
+function renderNotes(){if(notesMode==='map'){renderMap();if(!openId)requestAnimationFrame(()=>fitMap(false))}else if(notesMode==='graph'){requestAnimationFrame(()=>{sizeCanvas();rebuildGraph(true);if(!openId)fitGraph(false)})}else renderNoteList()}
 
 /* ================= SETTINGS ================= */
 $('nameInput').addEventListener('input',e=>{state.name=e.target.value;save();renderHome()});
