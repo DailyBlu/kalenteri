@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <title>Kalenteri</title>
+<script>try{var _s=JSON.parse(localStorage.getItem('kalenteri.v1'));if(_s&&_s.mode==='dark'){document.documentElement.dataset.mode='dark';document.querySelector('meta[name=theme-color]').content='#0d0d0d'}}catch(e){}</script>
 <style>
 :root{
   /* Theme tokens. Skins below override them; the app picks one via <html data-skin>. */
@@ -393,6 +394,22 @@ input.v-title::placeholder,.v-edit textarea::placeholder{color:var(--v-muted)}
 .ed-links{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 0}
 .ed-links span{font-size:13px;padding:4px 10px;border-radius:12px;background:var(--accent-soft);color:var(--accent);font-weight:600}
 
+/* ---------- DARK MODE: Grafiitti & oliivi ---------- */
+html[data-mode="dark"]{--top:#0d0d0d;--bg:#141414;--bg2:#202020;--card:#1b1b1b;--line:#2c2c2c;--ink:#ecebe7;--ink2:#b8b7b2;--muted:#82817c;
+  --accent:#7f9666;--accent-soft:#2a3122;--accent-text:#b3c79a;--shade:0,0,0;--red:#c9675a;color-scheme:dark}
+html[data-mode="dark"] .req-ic{background:var(--bg2)!important;color:var(--accent-text)!important}
+html[data-mode="dark"] .vault{--v-bg:#141414;--v-side:#0d0d0d;--v-acc:#b3c79a;--v-acc-bg:#2a3122;--v-ink:#ecebe7;--v-head:#ffffff;--v-muted:#82817c;--v-line:rgba(236,235,231,.09)}
+html[data-mode="dark"] .v-menu,html[data-mode="dark"] .v-add{background:#222}
+html[data-mode="dark"] .hero,html[data-mode="dark"] .cal-top,html[data-mode="dark"] .n-band,html[data-mode="dark"] .simple-top{border-bottom:1px solid var(--line)}
+html[data-mode="dark"] :is(.link,.is-today .wd,.is-today .dn,.empty-up b,.sheet-head button,.compose,.ed-back,.ed-act,.ed-done,.nav button.on,.d-row.sel .d-col .dn,.d-row.sel .d-col .wd,.f-row input[type=date],.f-row input[type=time],.ed-links span,.mode-seg button.on){color:var(--accent-text)}
+html[data-mode="dark"] .day.today .n{color:var(--accent-text);box-shadow:inset 0 0 0 1.5px var(--accent-text)}
+html[data-mode="dark"] .toast{background:var(--ink);color:var(--bg)}
+html[data-mode="dark"] .node.root{background:var(--accent-soft);color:var(--accent-text);box-shadow:0 0 0 1px var(--accent)}
+html[data-mode="dark"] .graph{background:#0d0d0d}
+.mode-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;margin:12px 16px 0;background:var(--card);border-radius:12px;box-shadow:0 0 0 1px var(--line)}
+.mode-seg button{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:9px;font-size:15px;font-weight:600;color:var(--ink2)}
+.mode-seg button.on{background:var(--accent-soft);color:var(--accent)}
+
 /* ---------- SHEET ---------- */
 .overlay{position:fixed;inset:0;background:rgba(10,14,35,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
 .overlay.open{opacity:1;pointer-events:auto}
@@ -577,6 +594,11 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <div class="group">
       <label class="row"><span>Nimi</span><input type="text" id="nameInput" placeholder="Kirjoita nimesi" autocomplete="given-name"></label>
     </div>
+    <div class="group-label">Ulkoasu</div>
+    <div class="mode-seg" id="modeSeg">
+      <button data-mode-set="light" id="modeLight"></button>
+      <button data-mode-set="dark" id="modeDark"></button>
+    </div>
     <div class="group-label">Tiedot</div>
     <div class="group">
       <button class="row" id="exportBtn"><span class="sp">Vie varmuuskopio</span><span id="icExport"></span></button>
@@ -587,7 +609,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.6</p>
+    <p class="hint" style="margin-top:24px">Versio 0.7</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -653,6 +675,8 @@ const I={
   graph:'<circle cx="6" cy="6" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="9" cy="18" r="2"/><path d="M8 6.3 16 7.7M6.6 8 8.4 16M10.4 16.6 16.7 9.6"/>',
   check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   sparkle:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'
 };
 const svg=(k,s=22,w=1.8)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
@@ -1769,6 +1793,19 @@ vaultEl.addEventListener('pointerdown',e=>{
 });
 
 function renderNotes(){if(notesMode==='map'){renderMap();if(!openId)requestAnimationFrame(()=>fitMap(false))}else if(notesMode==='graph'){requestAnimationFrame(()=>{sizeCanvas();rebuildGraph(true);if(!openId)fitGraph(false)})}else if(notesMode==='vault'){vaultDefault();renderVault()}else renderNoteList()}
+
+
+/* ================= APPEARANCE ================= */
+function applyMode(){
+  const dark=state.mode==='dark';
+  document.documentElement.dataset.mode=dark?'dark':'light';
+  document.querySelector('meta[name=theme-color]').content=dark?'#0d0d0d':'#1f3a2e';
+  $('modeLight').classList.toggle('on',!dark);$('modeDark').classList.toggle('on',dark);
+  if(typeof drawGraph==='function')try{drawGraph()}catch(e){}
+}
+$('modeLight').innerHTML=svg('sun',19)+'Vaalea';$('modeDark').innerHTML=svg('moon',19)+'Tumma';
+$('modeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-mode-set]');if(!b)return;state.mode=b.dataset.modeSet;save();applyMode()});
+applyMode();
 
 /* ================= SETTINGS ================= */
 $('nameInput').addEventListener('input',e=>{state.name=e.target.value;save();renderHome()});
