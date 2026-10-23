@@ -685,7 +685,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.9</p>
+    <p class="hint" style="margin-top:24px">Versio 0.10</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -1965,6 +1965,8 @@ function shiftPlan(p,mins,days){
   const lbl=days?`Siirretty huomiselle`:`Siirretty: ${timeLabel(p)}`;toast(lbl);
   if(days||p.date!==todayStr()){setTimeout(closeConfirm,500)}else renderConfirm();
 }
+
+
 
 /* ================= APPEARANCE ================= */
 function applyMode(){
