@@ -685,7 +685,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.9</p>
+    <p class="hint" style="margin-top:24px">Versio 0.10</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -1964,6 +1964,14 @@ function shiftPlan(p,mins,days){
   delete p.confirmed;save();refresh();
   const lbl=days?`Siirretty huomiselle`:`Siirretty: ${timeLabel(p)}`;toast(lbl);
   if(days||p.date!==todayStr()){setTimeout(closeConfirm,500)}else renderConfirm();
+}
+
+
+/* one-time: add the shift from the SameSystem screenshot */
+if(!state.addedShift20261023){
+  state.plans.push({id:uid(),title:'Työvuoro',date:'2026-10-23',allDay:false,start:'15:00',end:'20:00',place:'701 - Tammisto',
+    tag:{label:'Zon 4',color:'#c99a2e'},notes:''});
+  state.addedShift20261023=true;save();
 }
 
 /* ================= APPEARANCE ================= */
