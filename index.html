@@ -485,6 +485,31 @@ html[data-mode="dark"] .rs-edit{color:var(--accent-text)}
 .p-ok{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--card));padding:2px 7px;border-radius:6px}
 html[data-mode="dark"] .p-ok{color:var(--accent-text)}
 
+/* ---------- ACCOUNT ---------- */
+.acct{margin:12px 16px 0;background:var(--card);border-radius:12px;box-shadow:0 0 0 1px var(--line);padding:14px;display:flex;flex-direction:column;gap:10px}
+.acct p{margin:0;font-size:14px;color:var(--ink2);line-height:1.45}
+.acct-btn{height:46px;border-radius:12px;font-size:15.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.acct-btn.google{background:var(--card);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.acct-btn.primary{background:var(--accent);color:#fff}
+html[data-mode="dark"] .acct-btn.primary{background:#63804b}
+.acct-btn:disabled{opacity:.55}
+.acct-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.acct-or::before,.acct-or::after{content:"";flex:1;border-top:1px solid var(--line)}
+.acct input{height:46px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font-size:16px;outline:0;width:100%}
+.acct input:focus{border-color:var(--accent)}
+.acct-link{color:var(--accent);font-size:14px;font-weight:500;align-self:flex-start}
+html[data-mode="dark"] .acct-link{color:var(--accent-text)}
+.acct-err{color:var(--red);font-size:14px;min-height:0}
+.acct-err:empty{display:none}
+.acct-user{display:flex;align-items:center;gap:12px}
+.acct-av{width:42px;height:42px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:18px;flex:none}
+html[data-mode="dark"] .acct-av{color:var(--accent-text)}
+.acct-user b{display:block;font-size:15.5px;word-break:break-all}
+.acct-st{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2);margin-top:2px}
+.acct-st i{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.acct-st.ok i{background:#4f9a6b}.acct-st.saving i,.acct-st.connecting i{background:#c99a2e}.acct-st.error i{background:var(--red)}
+.acct-out{height:44px;border-radius:10px;color:var(--red);font-weight:600;font-size:15px;box-shadow:0 0 0 1px var(--line)}
+
 /* ---------- SHEET ---------- */
 .overlay{position:fixed;inset:0;background:rgba(10,14,35,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
 .overlay.open{opacity:1;pointer-events:auto}
@@ -665,6 +690,8 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
 <section class="page" id="page-more">
   <div class="simple-top"><h1>Lisää</h1></div>
   <div class="scroll">
+    <div class="group-label">Tili</div>
+    <div class="acct" id="acct"></div>
     <div class="group-label">Profiili</div>
     <div class="group">
       <label class="row"><span>Nimi</span><input type="text" id="nameInput" placeholder="Kirjoita nimesi" autocomplete="given-name"></label>
@@ -681,10 +708,10 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
       <button class="row danger" id="demoBtn" hidden><span class="sp">Poista esimerkit</span></button>
       <button class="row danger" id="wipeBtn"><span class="sp">Poista kaikki suunnitelmat</span></button>
     </div>
-    <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
+    <p class="hint" id="storeHint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.12</p>
+    <p class="hint" style="margin-top:24px">Versio 0.13</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -759,6 +786,7 @@ const I={
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  google:'<path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4" stroke="none"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853" stroke="none"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05" stroke="none"/><path d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1z" fill="#EA4335" stroke="none"/>',
   sparkle:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'
 };
 const svg=(k,s=22,w=1.8)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
@@ -787,7 +815,8 @@ const COLORS=['#4a6fa5','#3f8a5f','#c99a2e','#b5543f','#7a5ea8','#c9763a','#2f85
 const TAG_PRESETS=['Työ','Asiakas','Oma','Treeni','Tärkeä'];
 let state;
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.plans))return s}catch(e){}return null}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast('Tallennus epäonnistui')}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast('Tallennus epäonnistui')}}
+function save(){saveLocal();if(typeof scheduleSync==='function')scheduleSync()}
 state=load()||{name:'',plans:[],seeded:false};
 
 function seed(){
@@ -1982,12 +2011,177 @@ function shiftPlan(p,mins,days){
 }
 
 
-/* one-time: add the shift from the SameSystem screenshot */
-if(!state.addedShift20261023){
-  state.plans.push({id:uid(),title:'Työvuoro',date:'2026-10-23',allDay:false,start:'15:00',end:'20:00',place:'701 - Tammisto',
-    tag:{label:'Zon 4',color:'#c99a2e'},notes:''});
-  state.addedShift20261023=true;save();
+
+
+/* ================= ACCOUNT + CLOUD SYNC (Firebase) ================= */
+var CLOUD={user:null,ready:false,status:'off',err:'',lastOk:null,unsub:[],t:null,view:'',last:{plans:new Map(),notes:new Map(),meta:''}};
+const clean=o=>JSON.parse(JSON.stringify(o));
+const metaOf=()=>({name:state.name||'',folders:state.folders||[],links:(state.links||[]).map(l=>l[0]+'|'+l[1]),mode:state.mode||'light'});
+function applyMeta(m){state.name=m.name||'';state.folders=Array.isArray(m.folders)?m.folders:[];
+  state.links=(m.links||[]).map(x=>String(x).split('|')).filter(l=>l.length===2);if(m.mode&&m.mode!==state.mode){state.mode=m.mode;applyMode()}}
+function errText(e){const c=(e&&e.code)||'';
+  if(['auth/invalid-credential','auth/wrong-password','auth/user-not-found','auth/invalid-email','auth/invalid-login-credentials','auth/missing-password'].includes(c))return 'Väärä sähköposti tai salasana.';
+  if(c==='auth/admin-restricted-operation')return 'Tätä tiliä ei ole lisätty. Pyydä ylläpitäjää lisäämään sinut.';
+  if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request')return '';
+  if(c==='auth/popup-blocked')return 'Kirjautumisikkuna estettiin. Salli ponnahdusikkunat tai käytä sähköpostia.';
+  if(c==='auth/network-request-failed'||c==='unavailable')return 'Ei verkkoyhteyttä.';
+  if(c==='auth/too-many-requests')return 'Liian monta yritystä. Yritä hetken päästä uudelleen.';
+  if(c==='auth/unauthorized-domain')return 'Tätä osoitetta ei ole sallittu Firebasen asetuksissa.';
+  if(c==='permission-denied')return 'Tiliäsi ei ole lisätty sallittujen listalle.';
+  return (e&&e.message)||'Tuntematon virhe.';}
+function setSync(st,err){CLOUD.status=st;if(err!=null)CLOUD.err=err;if(st==='ok')CLOUD.lastOk=new Date();renderAccount()}
+function scheduleSync(){if(!CLOUD||!CLOUD.ready)return;clearTimeout(CLOUD.t);CLOUD.t=setTimeout(pushSync,900)}
+async function pushSync(){
+  if(!CLOUD||!CLOUD.ready||!window.FB)return;clearTimeout(CLOUD.t);
+  const {db,doc,writeBatch}=FB,uid=CLOUD.user.uid,ops=[];
+  for(const [kind,list] of [['plans',state.plans],['notes',state.notes]]){
+    const last=CLOUD.last[kind],seen=new Set();
+    for(const it of list){seen.add(it.id);const js=JSON.stringify(clean(it));if(last.get(it.id)!==js){ops.push(['set',kind,it.id,JSON.parse(js)]);last.set(it.id,js)}}
+    for(const id of [...last.keys()])if(!seen.has(id)){ops.push(['del',kind,id]);last.delete(id)}
+  }
+  const m=JSON.stringify(metaOf());if(m!==CLOUD.last.meta){ops.push(['set','meta','main',JSON.parse(m)]);CLOUD.last.meta=m}
+  if(!ops.length)return;
+  setSync('saving');
+  try{
+    for(let i=0;i<ops.length;i+=400){const b=writeBatch(db);
+      for(const [op,kind,id,data] of ops.slice(i,i+400)){const r=doc(db,'users',uid,kind,id);if(op==='set')b.set(r,data);else b.delete(r)}
+      await b.commit()}
+    setSync('ok','');
+  }catch(e){CLOUD.last={plans:new Map(),notes:new Map(),meta:''};setSync('error',errText(e));if(e.code==='permission-denied')notAllowed()}
 }
+function isEditingNote(id){
+  if(openId===id&&ed.contains(document.activeElement))return true;
+  return typeof panels!=='undefined'&&panels.some(p=>p.type==='note'&&p.edit&&p.noteId===id);
+}
+function remoteRefresh(){
+  index();renderHome();
+  if(currentPage==='cal'){const sc=$('agendaScroll'),y=sc.scrollTop;renderCal();sc.scrollTop=y}
+  if(currentPage==='more')$('nameInput').value=state.name||'';
+  if(currentPage==='notes'){
+    if(notesMode==='list')renderNoteList();
+    else if(notesMode==='map'){if(!gest)renderMap()}
+    else if(notesMode==='vault'){panels.forEach(p=>{if(!(p.type==='note'&&p.edit))renderPanel(p,true)});rebuildGraph(false)}
+  }
+}
+function startListeners(){
+  const {db,collection,doc,onSnapshot}=FB,uid=CLOUD.user.uid;
+  const onErr=e=>{setSync('error',errText(e));if(e.code==='permission-denied')notAllowed()};
+  for(const kind of ['plans','notes']){
+    CLOUD.unsub.push(onSnapshot(collection(db,'users',uid,kind),{includeMetadataChanges:false},snap=>{
+      let changed=false;const arr=state[kind],last=CLOUD.last[kind];
+      snap.docChanges().forEach(ch=>{
+        if(ch.doc.metadata.hasPendingWrites)return;
+        const id=ch.doc.id,i=arr.findIndex(x=>x.id===id);
+        if(ch.type==='removed'){if(i>=0&&!(kind==='notes'&&isEditingNote(id))){arr.splice(i,1);changed=true}last.delete(id);return}
+        const data={...ch.doc.data(),id},js=JSON.stringify(clean(data));
+        if(i>=0&&JSON.stringify(clean(arr[i]))===js){last.set(id,js);return}
+        if(kind==='notes'&&isEditingNote(id))return;      // don't overwrite what you're typing
+        last.set(id,js);if(i>=0)arr[i]=data;else arr.push(data);changed=true;
+      });
+      if(changed){saveLocal();remoteRefresh()}
+      if(!snap.metadata.fromCache&&CLOUD.status!=='saving')setSync('ok');
+    },onErr));
+  }
+  CLOUD.unsub.push(onSnapshot(doc(db,'users',uid,'meta','main'),d=>{
+    if(!d.exists()||d.metadata.hasPendingWrites)return;
+    const m=d.data(),js=JSON.stringify(clean({name:m.name||'',folders:m.folders||[],links:m.links||[],mode:m.mode||'light'}));
+    if(js===CLOUD.last.meta)return;CLOUD.last.meta=js;applyMeta(m);saveLocal();remoteRefresh();
+  },onErr));
+}
+async function onSignedIn(user){
+  CLOUD.user=user;setSync('connecting','');
+  const {db,doc,getDoc,getDocs,collection}=FB,uid=user.uid;
+  try{
+    const metaSnap=await getDoc(doc(db,'users',uid,'meta','main'));
+    if(!metaSnap.exists()){
+      // first sign-in ever: this device's plans and notes become the account's data
+      CLOUD.last={plans:new Map(),notes:new Map(),meta:''};CLOUD.ready=true;
+      await pushSync();toast('Tiedot tallennettu tilillesi');
+    }else{
+      // account already has data: load it (this device's signed-out data is kept as a local backup)
+      if(state.account!==uid){try{localStorage.setItem('kalenteri.guestBackup',JSON.stringify(state))}catch(e){}}
+      const [ps,ns]=await Promise.all([getDocs(collection(db,'users',uid,'plans')),getDocs(collection(db,'users',uid,'notes'))]);
+      state.plans=ps.docs.map(d=>({...d.data(),id:d.id}));state.notes=ns.docs.map(d=>({...d.data(),id:d.id}));
+      applyMeta(metaSnap.data());
+      CLOUD.last.plans=new Map(state.plans.map(x=>[x.id,JSON.stringify(clean(x))]));
+      CLOUD.last.notes=new Map(state.notes.map(x=>[x.id,JSON.stringify(clean(x))]));
+      CLOUD.last.meta=JSON.stringify(metaOf());CLOUD.ready=true;
+      if(state.account!==uid)toast('Kirjauduttu – tiedot ladattu tililtä');
+    }
+    state.account=uid;state.seeded=true;state.notesSeeded=3;saveLocal();remoteRefresh();
+    startListeners();setSync('ok','');
+  }catch(e){if(e.code==='permission-denied'){notAllowed();return}setSync('error',errText(e))}
+}
+async function notAllowed(){
+  CLOUD.ready=false;CLOUD.unsub.forEach(u=>u());CLOUD.unsub=[];
+  toast('Tiliäsi ei ole lisätty sallittujen listalle');
+  try{await FB.signOut(FB.auth)}catch(e){}
+  CLOUD.user=null;setSync('off','Tiliäsi ei ole lisätty sallittujen listalle. Pyydä ylläpitäjää lisäämään sähköpostisi.');
+}
+async function doSignOut(){
+  try{await pushSync()}catch(e){}
+  CLOUD.ready=false;CLOUD.unsub.forEach(u=>u());CLOUD.unsub=[];
+  try{await FB.signOut(FB.auth)}catch(e){}
+  try{await FB.terminate(FB.db);await FB.clearIndexedDbPersistence(FB.db)}catch(e){}
+  try{localStorage.removeItem(KEY)}catch(e){}          // remove the account's data from this device
+  location.reload();
+}
+function renderAccount(){
+  const box=$('acct');if(!box)return;
+  const sh=$('storeHint');if(sh)sh.textContent=CLOUD.user?'Olet kirjautuneena: tiedot tallentuvat tilillesi automaattisesti. Varmuuskopio on silti hyvä ottaa joskus.':'Et ole kirjautuneena: suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.';
+  if(!window.FB){box.innerHTML=CLOUD.fbFailed?'<p>Kirjautuminen ei ole nyt käytettävissä (ei verkkoyhteyttä). Sovellus toimii silti tällä laitteella.</p>':'<p>Ladataan…</p>';CLOUD.view='nofb';return}
+  if(CLOUD.user){
+    const u=CLOUD.user,st=CLOUD.status,off=!navigator.onLine;
+    const txt=off?'Offline – muutokset tallentuvat, kun yhteys palaa':st==='connecting'?'Yhdistetään…':st==='saving'?'Tallennetaan…':st==='error'?('Virhe: '+CLOUD.err):
+      CLOUD.lastOk?`Synkronoitu klo ${CLOUD.lastOk.getHours()}.${pad(CLOUD.lastOk.getMinutes())}`:'Synkronoitu';
+    const html=`<div class="acct-user"><span class="acct-av">${esc((u.email||'?')[0].toUpperCase())}</span><div style="min-width:0">
+        <b>${esc(u.email||'')}</b><div class="acct-st ${off?'saving':st}"><i></i><span>${esc(txt)}</span></div></div></div>
+      <p>Muutokset tallentuvat automaattisesti ja näkyvät kaikilla laitteilla, joilla olet kirjautuneena.</p>
+      <button class="acct-out" id="acctOut">Kirjaudu ulos</button>`;
+    box.innerHTML=html;CLOUD.view='in';
+    $('acctOut').onclick=()=>{$('acctOut').disabled=true;$('acctOut').textContent='Kirjaudutaan ulos…';doSignOut()};
+    return;
+  }
+  if(CLOUD.view==='out'){$('acctErr').textContent=CLOUD.err||'';return}   // keep typed values
+  box.innerHTML=`<p>Kirjaudu sisään, niin suunnitelmat ja muistiot tallentuvat automaattisesti tilillesi ja pysyvät samoina puhelimessa ja tietokoneella.</p>
+    <button class="acct-btn google" id="acctGoogle">${svg('google',20)}Jatka Googlella</button>
+    <div class="acct-or">tai</div>
+    <input type="email" id="acctEmail" placeholder="Sähköposti" autocomplete="username" inputmode="email">
+    <input type="password" id="acctPass" placeholder="Salasana" autocomplete="current-password">
+    <button class="acct-btn primary" id="acctLogin">Kirjaudu sisään</button>
+    <button class="acct-link" id="acctReset">Unohditko salasanan?</button>
+    <div class="acct-err" id="acctErr">${esc(CLOUD.err||'')}</div>`;
+  CLOUD.view='out';
+  const err=m=>{CLOUD.err=m;$('acctErr').textContent=m};
+  $('acctLogin').onclick=async()=>{
+    const em=$('acctEmail').value.trim(),pw=$('acctPass').value;if(!em||!pw){err('Kirjoita sähköposti ja salasana.');return}
+    const b=$('acctLogin');b.disabled=true;b.textContent='Kirjaudutaan…';err('');
+    try{await FB.signInWithEmailAndPassword(FB.auth,em,pw)}catch(e){err(errText(e));b.disabled=false;b.textContent='Kirjaudu sisään'}
+  };
+  $('acctPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('acctLogin').click()});
+  $('acctGoogle').onclick=async()=>{
+    err('');
+    try{await FB.signInWithPopup(FB.auth,new FB.GoogleAuthProvider())}
+    catch(e){const m=errText(e);const sa=window.navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+      err(m&&sa&&!/lisätty/.test(m)?m+' Kotivalikon sovelluksessa Google-kirjautuminen ei aina toimi – käytä sähköpostia ja salasanaa tai avaa sovellus Safarissa.':m)}
+  };
+  $('acctReset').onclick=async()=>{
+    const em=$('acctEmail').value.trim();if(!em){err('Kirjoita ensin sähköpostisi yllä olevaan kenttään.');return}
+    try{await FB.sendPasswordResetEmail(FB.auth,em);err('');toast('Salasanan palautuslinkki lähetetty, jos tili on olemassa')}catch(e){err(errText(e))}
+  };
+}
+function fbInit(){
+  renderAccount();
+  FB.onAuthStateChanged(FB.auth,u=>{
+    if(u&&(!CLOUD.user||CLOUD.user.uid!==u.uid)){CLOUD.view='';onSignedIn(u)}
+    else if(!u&&CLOUD.user){CLOUD.user=null;CLOUD.ready=false;CLOUD.unsub.forEach(x=>x());CLOUD.unsub=[];CLOUD.view='';renderAccount()}
+  });
+}
+if(window.FB)fbInit();else window.addEventListener('fb-ready',fbInit,{once:true});
+setTimeout(()=>{if(!window.FB){CLOUD.fbFailed=true;renderAccount()}},8000);
+renderAccount();
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pushSync()});
+window.addEventListener('online',()=>renderAccount());window.addEventListener('offline',()=>renderAccount());
 
 /* ================= APPEARANCE ================= */
 function applyMode(){
@@ -2074,6 +2268,28 @@ setInterval(()=>{if(!editing&&!$('sheet').classList.contains('open'))refresh()},
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script type="module">
+// Firebase: loaded separately so the app still works offline or if this fails to load.
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,memoryLocalCache,collection,doc,onSnapshot,writeBatch,getDoc,getDocs,terminate,clearIndexedDbPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const firebaseConfig={
+  apiKey:"AIzaSyC0G0ie-T2FtV2EBZLUx7XiHefGVfh9kLU",
+  authDomain:"kalenteri-d392d.firebaseapp.com",
+  projectId:"kalenteri-d392d",
+  storageBucket:"kalenteri-d392d.firebasestorage.app",
+  messagingSenderId:"156753489346",
+  appId:"1:156753489346:web:4c92dece40985c2c547a5b"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);auth.languageCode='fi';
+let db;
+try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}
+catch(e){db=initializeFirestore(app,{localCache:memoryLocalCache()})}
+window.FB={auth,db,onAuthStateChanged,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail,
+  collection,doc,onSnapshot,writeBatch,getDoc,getDocs,terminate,clearIndexedDbPersistence};
+window.dispatchEvent(new Event('fb-ready'));
 </script>
 </body>
 </html>
