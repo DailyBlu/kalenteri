@@ -182,7 +182,7 @@ svg{display:block;flex:none}
 #page-notes.split .n-head{display:none}
 #page-notes.vault-mode .n-head-row{display:none}
 #page-notes.vault-mode .n-head{padding-top:8px;padding-bottom:8px}
-.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg2);border-radius:9px;padding:2px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg2);border-radius:9px;padding:2px}
 .seg button{height:30px;font-size:13px;font-weight:600;border-radius:7px;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(var(--shade),.16)}
 .n-body{flex:1;position:relative;min-height:0}
@@ -602,7 +602,6 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <div class="seg" id="nSeg">
       <button data-mode="list" class="on" id="segList">Lista</button>
       <button data-mode="map" id="segMap">Mielikartta</button>
-      <button data-mode="graph" id="segGraph">Graafi</button>
       <button data-mode="vault" id="segVault">Holvi</button>
     </div>
   </div>
@@ -685,7 +684,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.11</p>
+    <p class="hint" style="margin-top:24px">Versio 0.12</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -1228,7 +1227,7 @@ $('nSearch').addEventListener('input',renderNoteList);
 function setNotesMode(m){
   if(openId)closeNote(true);
   notesMode=m;
-  [['list','segList'],['map','segMap'],['graph','segGraph'],['vault','segVault']].forEach(([k,i])=>$(i).classList.toggle('on',m===k));
+  [['list','segList'],['map','segMap'],['vault','segVault']].forEach(([k,i])=>$(i).classList.toggle('on',m===k));
   closeSide();closeMenu();
   nPage.classList.toggle('vault-mode',m==='vault');
   $('nListWrap').hidden=m!=='list';mapEl.hidden=m!=='map';graphEl.hidden=m!=='graph';vaultEl.hidden=m!=='vault';
@@ -1880,7 +1879,8 @@ $('vMenu').addEventListener('click',e=>{
   if(act==='graph'&&n){closeMenu();activeNote=p.pid;markActive();
     const gp=panels.find(x=>x.type==='graph');
     if(gp){drawPanelGraphs();scrollToPanel(gp)}else if(panels.length<PANEL_MAX)addPanel('graph');
-    else{const id=n.id;setNotesMode('graph');setTimeout(()=>{gSel=id;drawGraph()},120)}}
+    else{const i=panels.findIndex(x=>x.type!=='note'&&x.type!=='graph');const np={pid:uid(),type:'graph',noteId:null,hist:[],edit:false,tab:'files',q:'',view:null};
+      if(i>=0){panels[i]=np}else{panels[panels.length-1]=np}savePanels();renderVault()}}
   if(act==='pin'&&n){n.pinned=!n.pinned;save();closeMenu();toast(n.pinned?'Kiinnitetty':'Kiinnitys poistettu')}
   if(act==='del'&&n){
     if(!vDelArmed){vDelArmed=true;renderMenu();return}
