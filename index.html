@@ -423,6 +423,68 @@ html[data-mode="dark"] .seg button{color:#d9d8d3}
 html[data-mode="dark"] .seg button.on{background:#313b27;color:var(--accent-text);box-shadow:0 0 0 1px #48583b}
 html[data-mode="dark"] .req-ic{background:#313b27!important;color:var(--accent-text)!important}
 
+/* ---------- NOW CARD + CONFIRM SHEET ---------- */
+.now-card{margin:-50px 16px 0;background:var(--card);border-radius:14px;position:relative;overflow:hidden;
+  box-shadow:0 6px 18px rgba(var(--shade),.12),0 0 0 1px rgba(var(--shade),.05);padding:18px 18px 18px 22px;display:flex;flex-direction:column;gap:9px;text-align:left;width:calc(100% - 32px)}
+.now-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tag,var(--accent))}
+.now-card .nc-time{font-size:30px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.1}
+.now-card .nc-title{font-size:16px;font-weight:600;color:var(--ink)}
+.nc-chip{align-self:flex-start;font-size:14px;font-weight:600;padding:3px 10px;border-radius:7px;display:inline-flex;align-items:center;gap:5px}
+.nc-chip.wait{background:#f6e3cf;color:#7a4a1c}
+.nc-chip.live{background:color-mix(in srgb,var(--accent) 20%,var(--card));color:var(--accent)}
+.nc-chip.done{background:color-mix(in srgb,var(--accent) 20%,var(--card));color:var(--accent)}
+.nc-chip.late{background:#f5d9d4;color:#8f2f22}
+html[data-mode="dark"] .nc-chip.wait{background:#3a2e20;color:#e7c39a}
+html[data-mode="dark"] .nc-chip.late{background:#3b2320;color:#eeaa9e}
+html[data-mode="dark"] :is(.nc-chip.live,.nc-chip.done){color:var(--accent-text)}
+.nc-row{display:flex;align-items:center;gap:10px;font-size:15.5px;color:var(--ink2)}
+.nc-row .sq{width:18px;height:18px;border-radius:5px;background:var(--tag);flex:none}
+.btn-main{display:block;width:100%;height:52px;border-radius:26px;background:var(--accent);color:#fff;font-size:17px;font-weight:600;margin-top:8px;transition:transform .1s,opacity .2s}
+.btn-main:active{transform:scale(.98)}
+.btn-main.ghost{background:color-mix(in srgb,var(--accent) 12%,var(--card));color:var(--accent)}
+html[data-mode="dark"] .btn-main{background:#63804b}
+html[data-mode="dark"] .btn-main.ghost{background:#2a3122;color:var(--accent-text)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.btn-row .btn-main{margin-top:0}
+.home-has-now .up-card{margin-top:14px}
+
+.cf{position:fixed;inset:0;z-index:45;pointer-events:none}
+.cf-dim{position:absolute;inset:0;background:rgba(10,14,12,.45);opacity:0;transition:opacity .25s}
+.cf-panel{position:absolute;left:0;right:0;bottom:0;top:calc(var(--safe-t) + 14px);background:var(--card);border-radius:22px 22px 0 0;
+  transform:translateY(102%);transition:transform .36s cubic-bezier(.3,.7,.2,1);display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+.cf.open{pointer-events:auto}.cf.open .cf-dim{opacity:1}.cf.open .cf-panel{transform:none}
+.cf-head{flex:none;display:grid;grid-template-columns:80px 1fr 80px;align-items:center;padding:14px 12px;border-bottom:1px solid var(--line)}
+.cf-head h3{margin:0;text-align:center;font-size:19px;font-weight:700}
+.cf-head .cf-close{color:var(--accent);font-size:17px;font-weight:500;text-align:left;padding:4px}
+html[data-mode="dark"] .cf-head .cf-close{color:var(--accent-text)}
+.cf-body{flex:1;overflow-y:auto;padding:18px 16px calc(var(--safe-b) + 30px)}
+.tl{display:grid;grid-template-columns:62px 6px 1fr;column-gap:16px}
+.tl-time{font-size:16px;color:var(--ink2);font-variant-numeric:tabular-nums;padding-top:2px;text-align:right}
+.tl-time.big{font-size:20px;font-weight:700;color:var(--ink)}
+.tl-bar{border-radius:3px;background:var(--line);margin:4px 0}
+.tl-bar.on{background:var(--accent)}
+.tl-main{padding-bottom:22px;min-width:0}
+.tl-main .lbl{font-size:16px;color:var(--ink2)}
+.tl-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tl-top h4{margin:0;font-size:19px;font-weight:700;line-height:1.25}
+.tl-status{text-align:right;font-weight:700;font-size:17px;flex:none}
+.tl-status small{display:block;font-weight:500;font-size:15px}
+.tl-status.early,.tl-status.late{color:var(--red)}
+.tl-status.ok{color:var(--accent)}
+html[data-mode="dark"] .tl-status.ok{color:var(--accent-text)}
+.tl-sub{font-size:15px;color:var(--ink2);margin:6px 0 14px}
+.cf-done{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--accent);margin:4px 0 10px}
+html[data-mode="dark"] .cf-done{color:var(--accent-text)}
+.rs{margin-top:14px;padding:14px;border-radius:14px;background:var(--bg2)}
+.rs h5{margin:0 0 10px;font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.rs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rs-grid button{height:42px;border-radius:10px;background:var(--card);font-size:15px;font-weight:600;box-shadow:0 0 0 1px var(--line)}
+.rs-grid button:active{background:var(--accent-soft)}
+.rs-edit{margin-top:10px;width:100%;height:44px;border-radius:10px;background:none;color:var(--accent);font-weight:600;font-size:15.5px;box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 45%,transparent)}
+html[data-mode="dark"] .rs-edit{color:var(--accent-text)}
+.p-ok{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--card));padding:2px 7px;border-radius:6px}
+html[data-mode="dark"] .p-ok{color:var(--accent-text)}
+
 /* ---------- SHEET ---------- */
 .overlay{position:fixed;inset:0;background:rgba(10,14,35,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
 .overlay.open{opacity:1;pointer-events:auto}
@@ -482,6 +544,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
       </div>
     </div>
 
+    <div id="nowSlot"></div>
     <div class="up-card">
       <div class="up-head">
         <h2>Tulevat suunnitelmat</h2>
@@ -622,7 +685,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.8</p>
+    <p class="hint" style="margin-top:24px">Versio 0.9</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -648,6 +711,13 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
   <div id="sBody"></div>
 </div>
 
+<div class="cf" id="cf" aria-hidden="true">
+  <div class="cf-dim" id="cfDim"></div>
+  <div class="cf-panel" role="dialog" aria-modal="true" aria-labelledby="cfTitle">
+    <div class="cf-head"><button class="cf-close" id="cfClose">Sulje</button><h3 id="cfTitle">Vahvistus</h3><span></span></div>
+    <div class="cf-body" id="cfBody"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -787,7 +857,9 @@ function renderHome(){
   $('todayLine').innerHTML=today.length===0?'Sinulla on <b>ei mitään suunniteltua</b> tälle päivälle'
     :`Sinulla on <b>${today.length} ${today.length===1?'suunnitelma':'suunnitelmaa'}</b> tälle päivälle`;
   const nowT=nowHM();
-  const upcoming=sortedPlans().filter(p=>p.date>t||(p.date===t&&(p.allDay||!p.end||p.end>nowT)));
+  const nowPlan=pickNowPlan();
+  renderNowCard(nowPlan);
+  const upcoming=sortedPlans().filter(p=>p!==nowPlan&&(p.date>t||(p.date===t&&(p.allDay||!p.end||p.end>nowT))));
   const in30=ymd(addDays(new Date(),30));
   $('showAll').textContent=`Näytä kaikki (${upcoming.length})`;
   const SHOW=8, shown=upcoming.slice(0,SHOW);
@@ -800,7 +872,7 @@ function renderHome(){
     const d=shown[i].date,dt=parse(d),isT=d===t;let cards='';
     while(i<shown.length&&shown[i].date===d){const p=shown[i++];
       cards+=`<button class="mini" data-id="${p.id}" style="--tag:${p.allDay?'var(--red)':(p.tag?.color||'var(--accent)')}">
-        <span class="t">${esc(timeLabel(p))}${isNow(p)?'<span class="now">NYT</span>':''}</span>
+        <span class="t">${esc(timeLabel(p))}</span>
         <span class="s">${esc(p.title||'Nimetön')}</span>
         ${p.place?`<span class="s">${svg('pin',14)}${esc(p.place)}</span>`:(p.tag?`<span class="s"><i style="width:9px;height:9px;border-radius:50%;background:${p.tag.color}"></i>${esc(p.tag.label)}</span>`:'')}
       </button>`}
@@ -837,7 +909,7 @@ function renderGrid(){
 function planCard(p){
   const color=p.allDay?'var(--red)':(p.tag?.color||'var(--accent)');
   return `<button class="plan ${p.allDay?'allday':''}" data-id="${p.id}" style="--tag:${color}">
-    <span class="p-time">${esc(timeLabel(p))}${isNow(p)?'<span class="now">NYT</span>':''}</span>
+    <span class="p-time">${esc(timeLabel(p))}${p.confirmed?`<span class="p-ok">${svg('check',12,3)}Vahvistettu</span>`:''}</span>
     <span class="p-title">${esc(p.title||'Nimetön')}</span>
     ${p.place?`<span class="p-meta">${svg('pin',16)}<span>${esc(p.place)}</span></span>`:''}
     ${p.notes?`<span class="p-meta">${svg('text',16)}<span>${esc(p.notes.split('\n')[0])}</span></span>`:''}
@@ -1045,6 +1117,8 @@ function savePlan(){
   const plan={id:editing.id||uid(),title,date,allDay,start,end,place:$('fPlace').value.trim(),
     tag:label?{label,color:editing._color}:null,notes:$('fNotes').value.trim()};
   const i=state.plans.findIndex(x=>x.id===plan.id);
+  const prev=i>=0?state.plans[i]:null;
+  if(prev&&prev.confirmed&&prev.date===plan.date&&prev.start===plan.start&&prev.end===plan.end&&prev.allDay===plan.allDay)plan.confirmed=prev.confirmed;
   if(i>=0)state.plans[i]=plan;else state.plans.push(plan);
   save();closeSheet();
   selDate=date;viewMonth=monthStart(parse(date));
@@ -1807,6 +1881,90 @@ vaultEl.addEventListener('pointerdown',e=>{
 
 function renderNotes(){if(notesMode==='map'){renderMap();if(!openId)requestAnimationFrame(()=>fitMap(false))}else if(notesMode==='graph'){requestAnimationFrame(()=>{sizeCanvas();rebuildGraph(true);if(!openId)fitGraph(false)})}else if(notesMode==='vault'){vaultDefault();renderVault()}else renderNoteList()}
 
+
+
+/* ================= NOW CARD + CONFIRM ================= */
+const toMin=hm=>{const[h,m]=hm.split(':').map(Number);return h*60+m};
+const nowMin=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()};
+const fmtDur=m=>m<60?`${m} min`:(m%60?`${Math.floor(m/60)} h ${m%60} min`:`${m/60} h`);
+function pickNowPlan(){
+  const t=todayStr(),nm=nowMin();
+  const live=(byDate[t]||[]).filter(p=>p.allDay||!p.end||toMin(p.end)>nm);
+  return live.find(p=>!p.confirmed)||live[0]||null;
+}
+function planState(p){
+  if(p.confirmed)return {cls:'done',txt:'Vahvistettu'};
+  if(p.allDay||!p.start)return {cls:'wait',txt:'Odottaa vahvistusta'};
+  const d=toMin(p.start)-nowMin();
+  if(d>0)return {cls:'wait',txt:'Odottaa'};
+  if(d>=-5)return {cls:'live',txt:'Alkaa nyt'};
+  return {cls:'late',txt:'Käynnissä · ei vahvistettu'};
+}
+function renderNowCard(p){
+  const slot=$('nowSlot');$('page-home').classList.toggle('home-has-now',!!p);
+  if(!p){slot.innerHTML='';return}
+  const st=planState(p),color=p.allDay?'var(--red)':(p.tag?.color||'var(--accent)');
+  slot.innerHTML=`<div class="now-card" style="--tag:${color}">
+    <div class="nc-time">${esc(timeLabel(p))}</div>
+    <span class="nc-chip ${st.cls}">${st.cls==='done'?svg('check',14,2.6):''}${st.txt}</span>
+    <div class="nc-title">${esc(p.title||'Nimetön')}</div>
+    ${p.place?`<div class="nc-row">${svg('pin',18)}<span>${esc(p.place)}</span></div>`:''}
+    ${p.tag?`<div class="nc-row"><span class="sq" style="--tag:${p.tag.color}"></span><span style="color:var(--ink)">${esc(p.tag.label)}</span></div>`:''}
+    <button class="btn-main ${p.confirmed?'ghost':''}" id="ncBtn">${p.confirmed?'Näytä tiedot':'Vahvista'}</button>
+  </div>`;
+  $('ncBtn').onclick=()=>openConfirm(p.id);
+}
+let cfId=null,cfResched=false;
+function openConfirm(id){cfId=id;cfResched=false;renderConfirm();const c=$('cf');c.classList.add('open');c.setAttribute('aria-hidden','false')}
+function closeConfirm(){const c=$('cf');c.classList.remove('open');c.setAttribute('aria-hidden','true');cfId=null}
+$('cfClose').onclick=closeConfirm;$('cfDim').onclick=closeConfirm;
+function renderConfirm(){
+  const p=state.plans.find(x=>x.id===cfId);if(!p){closeConfirm();return}
+  const n=new Date(),nowHHMM=`${pad(n.getHours())}:${pad(n.getMinutes())}`;
+  let status='';
+  if(p.confirmed){const c=new Date(p.confirmed);status=`<div class="tl-status ok">Vahvistettu<small>klo ${pad(c.getHours())}:${pad(c.getMinutes())}</small></div>`}
+  else if(!p.allDay&&p.start&&p.date===todayStr()){
+    const d=toMin(p.start)-nowMin();
+    status=d>5?`<div class="tl-status early">Aikaisin<small>${fmtDur(d)}</small></div>`:d<-5?`<div class="tl-status late">Myöhässä<small>${fmtDur(-d)}</small></div>`:`<div class="tl-status ok">Ajallaan</div>`;
+  }
+  const rows=[];
+  if(!p.allDay&&p.start)rows.push([p.start,'Aikataulutettu aloitus']);
+  if(!p.allDay&&p.end)rows.push([p.end,'Suunniteltu päättyminen']);
+  if(p.allDay)rows.push(['','Koko päivän suunnitelma']);
+  $('cfTitle').textContent=p.confirmed?'Vahvistettu':'Vahvistus';
+  $('cfBody').innerHTML=`<div class="tl">
+      <div class="tl-time big">${nowHHMM}</div><div class="tl-bar on"></div>
+      <div class="tl-main">
+        <div class="tl-top"><h4>${p.confirmed?'Suunnitelma vahvistettu':'Vahvista suunnitelma'}</h4>${status}</div>
+        <div class="tl-sub">${esc(p.title||'Nimetön')}${p.place?' · '+esc(p.place):''}</div>
+        ${p.confirmed?`<div class="cf-done">${svg('check',18,2.6)}Merkitty vahvistetuksi</div>
+          <div class="btn-row"><button class="btn-main ghost" id="cfUndo">Peru vahvistus</button><button class="btn-main ghost" id="cfRes">Siirrä</button></div>`
+        :`<div class="btn-row"><button class="btn-main" id="cfOk">Vahvista</button><button class="btn-main ghost" id="cfRes">Siirrä</button></div>`}
+        ${cfResched?`<div class="rs"><h5>Siirrä suunnitelmaa</h5>
+          <div class="rs-grid">
+            <button data-sh="15">+15 min</button><button data-sh="30">+30 min</button><button data-sh="60">+1 h</button>
+            <button data-sh="-15">−15 min</button><button data-sh="-30">−30 min</button><button data-day="1">Huomenna</button>
+          </div>
+          <button class="rs-edit" id="cfEdit">Muokkaa aikaa ja tietoja…</button></div>`:''}
+      </div>
+      ${rows.map(([tm,l])=>`<div class="tl-time">${tm}</div><div class="tl-bar"></div><div class="tl-main" style="padding-bottom:16px"><div class="lbl">${l}</div></div>`).join('')}
+    </div>`;
+  const ok=$('cfOk');if(ok)ok.onclick=()=>{p.confirmed=Date.now();save();refresh();renderConfirm();toast('Vahvistettu');setTimeout(closeConfirm,700)};
+  const un=$('cfUndo');if(un)un.onclick=()=>{delete p.confirmed;save();refresh();renderConfirm();toast('Vahvistus peruttu')};
+  $('cfRes').onclick=()=>{cfResched=!cfResched;renderConfirm()};
+  const ed=$('cfEdit');if(ed)ed.onclick=()=>{const id=p.id;closeConfirm();setTimeout(()=>openEditor(id),250)};
+  $('cfBody').querySelectorAll('[data-sh],[data-day]').forEach(b=>b.onclick=()=>shiftPlan(p,+b.dataset.sh||0,+b.dataset.day||0));
+}
+function shiftPlan(p,mins,days){
+  if(days){p.date=ymd(addDays(parse(p.date),days))}
+  if(mins&&!p.allDay&&p.start){
+    const mv=hm=>{let v=toMin(hm)+mins;v=Math.max(0,Math.min(23*60+59,v));return `${pad(Math.floor(v/60))}:${pad(v%60)}`};
+    p.start=mv(p.start);if(p.end)p.end=mv(p.end);
+  }
+  delete p.confirmed;save();refresh();
+  const lbl=days?`Siirretty huomiselle`:`Siirretty: ${timeLabel(p)}`;toast(lbl);
+  if(days||p.date!==todayStr()){setTimeout(closeConfirm,500)}else renderConfirm();
+}
 
 /* ================= APPEARANCE ================= */
 function applyMode(){
