@@ -685,7 +685,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.10</p>
+    <p class="hint" style="margin-top:24px">Versio 0.11</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -1458,16 +1458,31 @@ function rebuildGraph(settle){
 }
 function tick(){
   const ns=[...gNodes.values()];
+  const dragging=ns.some(n=>n.fx!=null);
+  if(dragging)for(const n of ns)if(n.hx==null){n.hx=n.x;n.hy=n.y}       // remember where everyone was
+  const homing=ns.some(n=>n.hx!=null);
+  const soft=homing?.25:1;                                               // 75% stiffer while dragging/returning
   for(let i=0;i<ns.length;i++){const a=ns[i];for(let j=i+1;j<ns.length;j++){const b=ns[j];
     let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;if(d2<1){dx=Math.random()-.5;dy=Math.random()-.5;d2=1}
-    if(d2>360000)continue;const d=Math.sqrt(d2),f=1600*alpha/d2,fx=dx/d*f,fy=dy/d*f;a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy}}
-  for(const [ai,bi] of gEdges){const a=gNodes.get(ai),b=gNodes.get(bi);const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-75)*.05*alpha,fx=dx/d*f,fy=dy/d*f;a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy}
+    if(d2>360000)continue;const d=Math.sqrt(d2),f=1600*alpha*soft/d2,fx=dx/d*f,fy=dy/d*f;a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy}}
+  for(const [ai,bi] of gEdges){const a=gNodes.get(ai),b=gNodes.get(bi);const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-75)*.05*alpha*soft,fx=dx/d*f,fy=dy/d*f;a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy}
   for(const n of ns){if(n.fx!=null){n.x=n.fx;n.y=n.fy;n.vx=n.vy=0;continue}
-    n.vx-=n.x*.012*alpha;n.vy-=n.y*.012*alpha;n.vx*=.62;n.vy*=.62;n.x+=n.vx;n.y+=n.vy}
+    if(n.hx!=null){n.vx+=(n.hx-n.x)*.03;n.vy+=(n.hy-n.y)*.03}           // slow, smooth pull back home
+    else{n.vx-=n.x*.012*alpha;n.vy-=n.y*.012*alpha}
+    n.vx*=.62;n.vy*=.62;n.x+=n.vx;n.y+=n.vy}
+  // no overlapping: a dragged dot pushes others out of its way
+  for(const h of ns){if(h.fx==null)continue;
+    for(const n of ns){if(n===h||n.fx!=null)continue;
+      const dx=n.x-h.x,dy=n.y-h.y,d=Math.hypot(dx,dy)||.01,min=gRadius(h.id)+gRadius(n.id)+14;
+      if(d<min){n.x=h.x+dx/d*min;n.y=h.y+dy/d*min;n.vx*=.3;n.vy*=.3}}}
+  // once everyone is back home, forget the homes
+  if(!dragging&&homing&&ns.every(n=>n.hx==null||Math.hypot(n.x-n.hx,n.y-n.hy)<.4)){
+    for(const n of ns){if(n.hx!=null){n.x=n.hx;n.y=n.hy;n.vx=n.vy=0}n.hx=n.hy=null}}
   alpha*=.985;
 }
+function homesPending(){for(const n of gNodes.values())if(n.hx!=null)return true;return false}
 function kick(a){alpha=Math.max(alpha,a);if(!gRaf&&(!graphEl.hidden||vaultGraphsVisible()))gRaf=requestAnimationFrame(loop)}
-function loop(){gRaf=null;if(graphEl.hidden&&!vaultGraphsVisible())return;tick();drawGraph();if(alpha>.015||gDrag)gRaf=requestAnimationFrame(loop)}
+function loop(){gRaf=null;if(graphEl.hidden&&!vaultGraphsVisible())return;tick();drawGraph();if(alpha>.015||gDrag||homesPending())gRaf=requestAnimationFrame(loop)}
 function gNeighbors(id){const s=new Set([id]);for(const [a,b] of gEdges){if(a===id)s.add(b);if(b===id)s.add(a)}return s}
 function drawGraphTo(cv,view,sel){
   if(!cv||!cv.width||!view)return;
@@ -1520,7 +1535,7 @@ graphEl.addEventListener('pointerdown',e=>{
   try{graphEl.setPointerCapture(e.pointerId)}catch(_){}
   const p=grel(e);gp.set(e.pointerId,p);
   if(gp.size===1){const n=gHit(p);gg=n?{t:'node',n,sx:p.x,sy:p.y,moved:false}:{t:'pan',sx:p.x,sy:p.y,vx:gView.x,vy:gView.y,moved:false}}
-  else if(gp.size===2){if(gg&&gg.t==='node'){gg.n.fx=gg.n.fy=null;gDrag=false}
+  else if(gp.size===2){if(gg&&gg.t==='node'){gg.n.fx=gg.n.fy=null;gg.n.hx=gg.n.hy=null;gDrag=false;kick(.2)}
     const [a,b]=[...gp.values()];gg={t:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,k0:gView.k,wx:((a.x+b.x)/2-gView.x)/gView.k,wy:((a.y+b.y)/2-gView.y)/gView.k}}
 });
 graphEl.addEventListener('pointermove',e=>{
@@ -1533,7 +1548,7 @@ graphEl.addEventListener('pointermove',e=>{
 });
 function gEnd(e){
   if(!gp.has(e.pointerId))return;gp.delete(e.pointerId);if(!gg)return;
-  if(gg.t==='node'){gg.n.fx=gg.n.fy=null;gDrag=false;if(!gg.moved&&e.type==='pointerup')openNote(gg.n.id,true);gg=null}
+  if(gg.t==='node'){gg.n.fx=gg.n.fy=null;gg.n.hx=gg.n.hy=null;gDrag=false;kick(.2);if(!gg.moved&&e.type==='pointerup')openNote(gg.n.id,true);gg=null}
   else if(gg.t==='pan')gg=null;else if(gp.size<2)gg=null;
 }
 graphEl.addEventListener('pointerup',gEnd);graphEl.addEventListener('pointercancel',gEnd);
@@ -1816,7 +1831,7 @@ function setupGraphPanel(p,body){
     e.preventDefault();try{body.setPointerCapture(e.pointerId)}catch(_){}
     const pt=rel(e);ptr.set(e.pointerId,pt);
     if(ptr.size===1){const n=hit(pt);g=n?{t:'node',n,sx:pt.x,sy:pt.y,moved:false}:{t:'pan',sx:pt.x,sy:pt.y,vx:p.view.x,vy:p.view.y,moved:false}}
-    else if(ptr.size===2){if(g&&g.t==='node'){g.n.fx=g.n.fy=null;gDrag=false}const [a,b]=[...ptr.values()];
+    else if(ptr.size===2){if(g&&g.t==='node'){g.n.fx=g.n.fy=null;g.n.hx=g.n.hy=null;gDrag=false;kick(.2)}const [a,b]=[...ptr.values()];
       g={t:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,k0:p.view.k,wx:((a.x+b.x)/2-p.view.x)/p.view.k,wy:((a.y+b.y)/2-p.view.y)/p.view.k}}
   });
   body.addEventListener('pointermove',e=>{
@@ -1828,7 +1843,7 @@ function setupGraphPanel(p,body){
     else if(g.t==='pan'){p.view.x=g.vx+dx;p.view.y=g.vy+dy;drawGraphTo(p.cv,p.view,selNote())}
   });
   const end=e=>{if(!ptr.has(e.pointerId))return;ptr.delete(e.pointerId);if(!g)return;
-    if(g.t==='node'){g.n.fx=g.n.fy=null;gDrag=false;if(!g.moved&&e.type==='pointerup')openInNote(g.n.id);g=null}
+    if(g.t==='node'){g.n.fx=g.n.fy=null;g.n.hx=g.n.hy=null;gDrag=false;kick(.2);if(!g.moved&&e.type==='pointerup')openInNote(g.n.id);g=null}
     else if(g.t==='pan')g=null;else if(ptr.size<2)g=null};
   body.addEventListener('pointerup',end);body.addEventListener('pointercancel',end);
   body.addEventListener('wheel',e=>{e.preventDefault();const pt=rel(e),v=p.view,k=Math.max(.15,Math.min(3,v.k*Math.exp(-e.deltaY*.0015)));
