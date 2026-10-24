@@ -711,7 +711,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint" id="storeHint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.13</p>
+    <p class="hint" style="margin-top:24px">Versio 0.14</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -813,11 +813,42 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const KEY='kalenteri.v1';
 const COLORS=['#4a6fa5','#3f8a5f','#c99a2e','#b5543f','#7a5ea8','#c9763a','#2f8585','#7a8199'];
 const TAG_PRESETS=['Työ','Asiakas','Oma','Treeni','Tärkeä'];
+/* ---- input validation: every plan/note/setting that enters the app (storage, import, cloud) passes through here ---- */
+const ID_RE=/^[A-Za-z0-9_-]{1,80}$/;
+const isColor=c=>typeof c==='string'&&/^#[0-9a-fA-F]{3,8}$/.test(c);
+const safeColor=c=>isColor(c)?c:'var(--accent)';
+const str=(v,n)=>typeof v==='string'?v.slice(0,n):'';
+const num=(v,d)=>typeof v==='number'&&isFinite(v)?v:d;
+function cleanPlan(x){
+  if(!x||typeof x!=='object'||!/^\d{4}-\d{2}-\d{2}$/.test(x.date))return null;
+  const tm=v=>typeof v==='string'&&/^\d{2}:\d{2}$/.test(v)?v:'';
+  const o={id:ID_RE.test(x.id)?x.id:uid(),title:str(x.title,200),date:x.date,allDay:!!x.allDay,start:tm(x.start),end:tm(x.end),place:str(x.place,200),
+    tag:x.tag&&typeof x.tag==='object'?{label:str(x.tag.label,40),color:isColor(x.tag.color)?x.tag.color:COLORS[0]}:null,notes:str(x.notes,5000)};
+  if(typeof x.confirmed==='number'&&isFinite(x.confirmed))o.confirmed=x.confirmed;
+  if(x.demo)o.demo=true;return o;
+}
+function cleanNote(x){
+  if(!x||typeof x!=='object')return null;
+  const o={id:ID_RE.test(x.id)?x.id:uid(),title:str(x.title,200),body:str(x.body,200000),created:num(x.created,Date.now()),updated:num(x.updated,Date.now()),
+    pinned:!!x.pinned};
+  if(typeof x.x==='number'&&isFinite(x.x))o.x=x.x;if(typeof x.y==='number'&&isFinite(x.y))o.y=x.y;
+  if(typeof x.folder==='string')o.folder=str(x.folder,60);if(x.demo)o.demo=true;return o;
+}
+const cleanFolders=a=>Array.isArray(a)?[...new Set(a.filter(f=>typeof f==='string'&&f.trim()).map(f=>f.slice(0,60)))]:[];
+const cleanLinks=a=>Array.isArray(a)?a.filter(l=>Array.isArray(l)&&l.length===2&&ID_RE.test(l[0])&&ID_RE.test(l[1])):[];
+function cleanState(st){
+  st.plans=(Array.isArray(st.plans)?st.plans:[]).map(cleanPlan).filter(Boolean);
+  if(st.notes!=null)st.notes=(Array.isArray(st.notes)?st.notes:[]).map(cleanNote).filter(Boolean);
+  if(st.folders!=null)st.folders=cleanFolders(st.folders);
+  if(st.links!=null)st.links=cleanLinks(st.links);
+  st.name=str(st.name,40);if(st.mode!=='dark')delete st.mode;
+  return st;
+}
 let state;
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.plans))return s}catch(e){}return null}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast('Tallennus epäonnistui')}}
 function save(){saveLocal();if(typeof scheduleSync==='function')scheduleSync()}
-state=load()||{name:'',plans:[],seeded:false};
+state=cleanState(load()||{name:'',plans:[],seeded:false});
 
 function seed(){
   const t=new Date();
@@ -899,10 +930,10 @@ function renderHome(){
   while(i<shown.length){
     const d=shown[i].date,dt=parse(d),isT=d===t;let cards='';
     while(i<shown.length&&shown[i].date===d){const p=shown[i++];
-      cards+=`<button class="mini" data-id="${p.id}" style="--tag:${p.allDay?'var(--red)':(p.tag?.color||'var(--accent)')}">
+      cards+=`<button class="mini" data-id="${esc(p.id)}" style="--tag:${p.allDay?'var(--red)':(safeColor(p.tag?.color))}">
         <span class="t">${esc(timeLabel(p))}</span>
         <span class="s">${esc(p.title||'Nimetön')}</span>
-        ${p.place?`<span class="s">${svg('pin',14)}${esc(p.place)}</span>`:(p.tag?`<span class="s"><i style="width:9px;height:9px;border-radius:50%;background:${p.tag.color}"></i>${esc(p.tag.label)}</span>`:'')}
+        ${p.place?`<span class="s">${svg('pin',14)}${esc(p.place)}</span>`:(p.tag?`<span class="s"><i style="width:9px;height:9px;border-radius:50%;background:${safeColor(p.tag.color)}"></i>${esc(p.tag.label)}</span>`:'')}
       </button>`}
     html+=`<div class="c-group"><div class="c-date ${isT?'is-today':''}"><div class="wd">${isT?'tänään':WD[dt.getDay()]}</div><div class="dn">${dt.getDate()}</div><div class="mo">${M_SHORT[dt.getMonth()]}</div></div>${cards}</div>`;
   }
@@ -926,7 +957,7 @@ function renderGrid(){
     for(let d=0;d<7;d++){
       const dt=addDays(ws,d),s=ymd(dt),ps=byDate[s]||[];
       const cls=['day',dt.getMonth()!==first.getMonth()?'out':'',s===t?'today':'',s===selDate?'sel':''].join(' ');
-      const dots=ps.slice(0,3).map(p=>`<i style="background:${p.allDay?'var(--red)':(p.tag?.color||'var(--accent)')}"></i>`).join('');
+      const dots=ps.slice(0,3).map(p=>`<i style="background:${p.allDay?'var(--red)':(safeColor(p.tag?.color))}"></i>`).join('');
       h+=`<button class="${cls}" data-date="${s}"><span class="n">${dt.getDate()}</span><span class="dots">${dots}</span></button>`;
     }
     h+='</div>';
@@ -935,13 +966,13 @@ function renderGrid(){
 }
 
 function planCard(p){
-  const color=p.allDay?'var(--red)':(p.tag?.color||'var(--accent)');
-  return `<button class="plan ${p.allDay?'allday':''}" data-id="${p.id}" style="--tag:${color}">
+  const color=p.allDay?'var(--red)':(safeColor(p.tag?.color));
+  return `<button class="plan ${p.allDay?'allday':''}" data-id="${esc(p.id)}" style="--tag:${color}">
     <span class="p-time">${esc(timeLabel(p))}${p.confirmed?`<span class="p-ok">${svg('check',12,3)}Vahvistettu</span>`:''}</span>
     <span class="p-title">${esc(p.title||'Nimetön')}</span>
     ${p.place?`<span class="p-meta">${svg('pin',16)}<span>${esc(p.place)}</span></span>`:''}
     ${p.notes?`<span class="p-meta">${svg('text',16)}<span>${esc(p.notes.split('\n')[0])}</span></span>`:''}
-    ${p.tag?`<span class="chip" style="--tag:${p.tag.color}"><i></i>${esc(p.tag.label)}</span>`:''}
+    ${p.tag?`<span class="chip" style="--tag:${safeColor(p.tag.color)}"><i></i>${esc(p.tag.label)}</span>`:''}
   </button>`;
 }
 
@@ -1105,9 +1136,9 @@ function openEditor(id,date){
     </div>
     <div class="f-group">
       <div class="f-row"><label for="fAll">Koko päivä</label><span style="flex:1"></span><span class="toggle"><input type="checkbox" id="fAll" ${e.allDay?'checked':''}><span></span></span></div>
-      <div class="f-row"><label for="fDate">Päivä</label><input type="date" id="fDate" value="${e.date}"></div>
-      <div class="f-row timepair" ${e.allDay?'hidden':''}><label for="fStart">Alkaa</label><input type="time" id="fStart" value="${e.start||''}"></div>
-      <div class="f-row timepair" ${e.allDay?'hidden':''}><label for="fEnd">Päättyy</label><input type="time" id="fEnd" value="${e.end||''}"></div>
+      <div class="f-row"><label for="fDate">Päivä</label><input type="date" id="fDate" value="${esc(e.date)}"></div>
+      <div class="f-row timepair" ${e.allDay?'hidden':''}><label for="fStart">Alkaa</label><input type="time" id="fStart" value="${esc(e.start||'')}"></div>
+      <div class="f-row timepair" ${e.allDay?'hidden':''}><label for="fEnd">Päättyy</label><input type="time" id="fEnd" value="${esc(e.end||'')}"></div>
     </div>
     <div class="f-group">
       <div class="f-row"><label for="fTag">Tunniste</label><input id="fTag" placeholder="esim. Työ" value="${esc(e.tag?.label||'')}" maxlength="24"></div>
@@ -1242,7 +1273,7 @@ function renderNoteList(){
     for(const n of ns){
       const title=noteName(n),lines=(n.body||'').split('\n').map(x=>x.trim()).filter(Boolean);
       const prev=(n.title||'').trim()?lines[0]:lines[1];
-      h+=`<button class="n-row" data-note="${n.id}"><div class="t">${esc(title)}</div><div class="s"><b>${shortStamp(n.updated)}</b>${esc(prev||'Ei lisätekstiä')}</div></button>`;
+      h+=`<button class="n-row" data-note="${esc(n.id)}"><div class="t">${esc(title)}</div><div class="s"><b>${shortStamp(n.updated)}</b>${esc(prev||'Ei lisätekstiä')}</div></button>`;
     }
     h+='</div>';
   }
@@ -1309,7 +1340,7 @@ function allEdges(){
 function tagsOf(n){return [...new Set([...((n.title||'')+' '+(n.body||'')).matchAll(/(?:^|\s)#([\p{L}\p{N}_\-\/]+)/gu)].map(m=>m[1].toLowerCase()))]}
 function renderEdLinks(n){
   const ids=[...new Set(allEdges().filter(e=>e[0]===n.id||e[1]===n.id).map(e=>e[0]===n.id?e[1]:e[0]))];
-  $('edLinks').innerHTML=ids.map(i=>noteById(i)).filter(Boolean).map(x=>`<button data-go="${x.id}">${svg('link',12,2.2)}${esc(noteName(x))}</button>`).join('');
+  $('edLinks').innerHTML=ids.map(i=>noteById(i)).filter(Boolean).map(x=>`<button data-go="${esc(x.id)}">${svg('link',12,2.2)}${esc(noteName(x))}</button>`).join('');
   $('edTags').innerHTML=tagsOf(n).map(t=>`<span>#${esc(t)}</span>`).join('');
 }
 function sizeBody(){const t=$('edBody');t.style.height='auto';t.style.height=Math.max(200,t.scrollHeight)+'px'}
@@ -1379,7 +1410,7 @@ function linkCount(id){return state.links.filter(l=>l.includes(id)).length}
 function renderMap(){
   ensurePositions();
   const maxL=Math.max(0,...state.notes.map(n=>linkCount(n.id)));
-  $('nodes').innerHTML=state.notes.map(n=>`<button class="node ${maxL>1&&linkCount(n.id)===maxL?'root':''}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px">${esc(noteName(n))}</button>`).join('');
+  $('nodes').innerHTML=state.notes.map(n=>`<button class="node ${maxL>1&&linkCount(n.id)===maxL?'root':''}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px">${esc(noteName(n))}</button>`).join('');
   drawLinks();markSel();
 }
 function drawLinks(){
@@ -1388,7 +1419,7 @@ function drawLinks(){
     return `<path class="${w?'wiki':''}" d="M${A.x} ${A.y} Q${mx-dy*c} ${my+dx*c} ${B.x} ${B.y}"/>`}).join('');
 }
 function markSel(){$('nodes').querySelectorAll('.node').forEach(el=>{el.classList.toggle('sel',el.dataset.id===openId&&edSplit);el.classList.toggle('pick',el.dataset.id===pickId)})}
-function updateNodeLabel(n){const el=$('nodes').querySelector(`[data-id="${n.id}"]`);if(el)el.textContent=noteName(n);renderEdLinks(n)}
+function updateNodeLabel(n){const el=$('nodes').querySelector(`[data-id="${esc(n.id)}"]`);if(el)el.textContent=noteName(n);renderEdLinks(n)}
 function fitMap(anim){
   const r=mapEl.getBoundingClientRect();if(!r.width||!state.notes.length){view={x:r.width/2,y:r.height/2,k:1};applyView(anim);return}
   const xs=state.notes.map(n=>n.x),ys=state.notes.map(n=>n.y);
@@ -1678,7 +1709,7 @@ function renderFiles(p,body){
   const sel=selNote();
   if(p.tab==='files'){
     const byName=(a,b)=>noteName(a).localeCompare(noteName(b),'fi');
-    const row=(n,nested)=>`<button class="v-row file ${nested?'nested':'root'} ${n.id===sel?'on':''}" data-open="${n.id}"><span class="nm">${esc(noteName(n))}</span></button>`;
+    const row=(n,nested)=>`<button class="v-row file ${nested?'nested':'root'} ${n.id===sel?'on':''}" data-open="${esc(n.id)}"><span class="nm">${esc(noteName(n))}</span></button>`;
     let h=p.addFolder?`<input class="v-inp" data-folderin placeholder="Kansion nimi" maxlength="40">`:'';
     for(const f of allFolders()){
       const ns=state.notes.filter(n=>n.folder===f).sort(byName),open=vOpen.has(f);
@@ -1708,7 +1739,7 @@ function renderResults(p,body){
   const hl=txt=>{const i=txt.toLowerCase().indexOf(q);if(i<0||isTag)return esc(txt);return esc(txt.slice(0,i))+'<mark>'+esc(txt.slice(i,i+q.length))+'</mark>'+esc(txt.slice(i+q.length))};
   r.innerHTML=`<div class="v-label">${hits.length} ${hits.length===1?'tulos':'tulosta'}</div>`+hits.map(n=>{
     const line=(n.body||'').split('\n').find(l=>l.toLowerCase().includes(q))||firstLine(n.body)||'';
-    return `<button class="v-res" data-open="${n.id}"><b>${hl(noteName(n))}</b><span>${hl(line.trim().slice(0,90))}</span></button>`}).join('');
+    return `<button class="v-res" data-open="${esc(n.id)}"><b>${hl(noteName(n))}</b><span>${hl(line.trim().slice(0,90))}</span></button>`}).join('');
 }
 
 /* note pane */
@@ -1716,7 +1747,7 @@ function renderNoteBody(p,body,keep){
   const y=body.scrollTop,n=noteById(p.noteId);
   if(!n){
     const rec=[...state.notes].sort((a,b)=>b.updated-a.updated).slice(0,12);
-    body.innerHTML=`<div class="v-label" style="padding-top:14px">Avaa muistio</div>`+rec.map(r=>`<button class="v-res" data-open="${r.id}"><b>${esc(noteName(r))}</b><span>${esc(firstLine(r.body))}</span></button>`).join('')+
+    body.innerHTML=`<div class="v-label" style="padding-top:14px">Avaa muistio</div>`+rec.map(r=>`<button class="v-res" data-open="${esc(r.id)}"><b>${esc(noteName(r))}</b><span>${esc(firstLine(r.body))}</span></button>`).join('')+
       `<button class="v-res" data-act="newhere"><b style="color:var(--v-acc)">+ Uusi muistio</b></button>`;return}
   const words=((n.body||'').match(/\S+/g)||[]).length,bl=backlinksOf(n.id);
   const manual=state.links.filter(l=>l.includes(n.id)).map(l=>noteById(l[0]===n.id?l[1]:l[0])).filter(Boolean);
@@ -1727,8 +1758,8 @@ function renderNoteBody(p,body,keep){
   }else{
     h+=`<div class="v-title">${esc(noteName(n))}</div><div class="md">${mdRender(n.body)||'<p class="v-muted">Tyhjä muistio. Napauta kynää kirjoittaaksesi.</p>'}</div>`;
   }
-  if(bl.length)h+=`<div class="v-sec"><h4>Takalinkit · ${bl.length}</h4>${bl.map(b=>`<button class="v-bl" data-open="${b.id}"><b>${esc(noteName(b))}</b><span>${esc(snippetFor(b,n.id))}</span></button>`).join('')}</div>`;
-  if(manual.length)h+=`<div class="v-sec"><h4>Mielikartassa · ${manual.length}</h4>${manual.map(b=>`<button class="v-bl" data-open="${b.id}"><b>${esc(noteName(b))}</b><span>${esc(firstLine(b.body))}</span></button>`).join('')}</div>`;
+  if(bl.length)h+=`<div class="v-sec"><h4>Takalinkit · ${bl.length}</h4>${bl.map(b=>`<button class="v-bl" data-open="${esc(b.id)}"><b>${esc(noteName(b))}</b><span>${esc(snippetFor(b,n.id))}</span></button>`).join('')}</div>`;
+  if(manual.length)h+=`<div class="v-sec"><h4>Mielikartassa · ${manual.length}</h4>${manual.map(b=>`<button class="v-bl" data-open="${esc(b.id)}"><b>${esc(noteName(b))}</b><span>${esc(firstLine(b.body))}</span></button>`).join('')}</div>`;
   h+=`<div class="v-status">${bl.length} ${bl.length===1?'takalinkki':'takalinkkiä'} · ${words} ${words===1?'sana':'sanaa'} · ${shortStamp(n.updated)}</div>`;
   body.innerHTML=h;body.scrollTop=keep?y:0;
   if(p.edit){
@@ -1810,14 +1841,14 @@ vStrip.addEventListener('click',e=>{
   }
   if(p.type==='files'){
     const ft=t.closest('[data-ftab]');if(ft){p.tab=ft.dataset.ftab;p.addFolder=false;savePanels();renderPanel(p);if(p.tab==='search')setTimeout(()=>panelEl(p)?.querySelector('[data-search]')?.focus(),30);return}
-    const f=t.closest('[data-folder]');if(f){const d=document.createElement('div');d.innerHTML=f.dataset.folder;const nm=d.textContent;vOpen.has(nm)?vOpen.delete(nm):vOpen.add(nm);persistOpen();renderPanel(p,true);return}
+    const f=t.closest('[data-folder]');if(f){const nm=f.dataset.folder;vOpen.has(nm)?vOpen.delete(nm):vOpen.add(nm);persistOpen();renderPanel(p,true);return}
     const tq=t.closest('[data-tagq]');if(tq){p.tab='search';p.q='#'+tq.dataset.tagq;savePanels();renderPanel(p);return}
     const o=t.closest('[data-open]');if(o)openInNote(o.dataset.open);
     return;
   }
   if(p.type==='note'&&!p.edit){
     const wl=t.closest('.wl');
-    if(wl){if(wl.dataset.wl)openInNote(wl.dataset.wl);else{const d=document.createElement('div');d.innerHTML=wl.dataset.name;openInNote(newVaultNote(noteById(p.noteId)?.folder||'',d.textContent.trim()).id,true)}return}
+    if(wl){if(wl.dataset.wl)openInNote(wl.dataset.wl);else{openInNote(newVaultNote(noteById(p.noteId)?.folder||'',String(wl.dataset.name||'').trim().slice(0,200)).id,true)}return}
     const tg=t.closest('[data-tag]');
     if(tg){const fp=panels.find(x=>x.type==='files');
       if(fp){fp.tab='search';fp.q='#'+tg.dataset.tag;savePanels();renderPanel(fp);scrollToPanel(fp)}
@@ -1901,7 +1932,7 @@ function renderMenu(){
 function moveTo(f){const n=noteById(vMenuCtx?.noteId);if(!n)return;n.folder=f;if(f&&!state.folders.includes(f))state.folders.push(f);if(f)vOpen.add(f);persistOpen();save();closeMenu();renderPanel(vMenuCtx,true);renderPanelsOfType('files');toast(f?`Siirretty: ${f}`:'Siirretty juureen')}
 $('vMenu').addEventListener('click',e=>{
   e.stopPropagation();const p=vMenuCtx,n=p&&noteById(p.noteId);
-  const mv=e.target.closest('[data-mv]');if(mv){const d=document.createElement('div');d.innerHTML=mv.dataset.mv;moveTo(d.textContent);return}
+  const mv=e.target.closest('[data-mv]');if(mv){moveTo(mv.dataset.mv);return}
   const a=e.target.closest('[data-mact]');if(!a)return;const act=a.dataset.mact;
   if(act==='new'){closeMenu();activeNote=p.pid;openInNote(newVaultNote(n?.folder||'').id,true)}
   if(act==='move'){vMenuMode='move';renderMenu()}
@@ -1947,13 +1978,13 @@ function planState(p){
 function renderNowCard(p){
   const slot=$('nowSlot');$('page-home').classList.toggle('home-has-now',!!p);
   if(!p){slot.innerHTML='';return}
-  const st=planState(p),color=p.allDay?'var(--red)':(p.tag?.color||'var(--accent)');
+  const st=planState(p),color=p.allDay?'var(--red)':(safeColor(p.tag?.color));
   slot.innerHTML=`<div class="now-card" style="--tag:${color}">
     <div class="nc-time">${esc(timeLabel(p))}</div>
     <span class="nc-chip ${st.cls}">${st.cls==='done'?svg('check',14,2.6):''}${st.txt}</span>
     <div class="nc-title">${esc(p.title||'Nimetön')}</div>
     ${p.place?`<div class="nc-row">${svg('pin',18)}<span>${esc(p.place)}</span></div>`:''}
-    ${p.tag?`<div class="nc-row"><span class="sq" style="--tag:${p.tag.color}"></span><span style="color:var(--ink)">${esc(p.tag.label)}</span></div>`:''}
+    ${p.tag?`<div class="nc-row"><span class="sq" style="--tag:${safeColor(p.tag.color)}"></span><span style="color:var(--ink)">${esc(p.tag.label)}</span></div>`:''}
     <button class="btn-main ${p.confirmed?'ghost':''}" id="ncBtn">${p.confirmed?'Näytä tiedot':'Vahvista'}</button>
   </div>`;
   $('ncBtn').onclick=()=>openConfirm(p.id);
@@ -1991,7 +2022,7 @@ function renderConfirm(){
           </div>
           <button class="rs-edit" id="cfEdit">Muokkaa aikaa ja tietoja…</button></div>`:''}
       </div>
-      ${rows.map(([tm,l])=>`<div class="tl-time">${tm}</div><div class="tl-bar"></div><div class="tl-main" style="padding-bottom:16px"><div class="lbl">${l}</div></div>`).join('')}
+      ${rows.map(([tm,l])=>`<div class="tl-time">${esc(tm)}</div><div class="tl-bar"></div><div class="tl-main" style="padding-bottom:16px"><div class="lbl">${l}</div></div>`).join('')}
     </div>`;
   const ok=$('cfOk');if(ok)ok.onclick=()=>{p.confirmed=Date.now();save();refresh();renderConfirm();toast('Vahvistettu');setTimeout(closeConfirm,700)};
   const un=$('cfUndo');if(un)un.onclick=()=>{delete p.confirmed;save();refresh();renderConfirm();toast('Vahvistus peruttu')};
@@ -2017,8 +2048,8 @@ function shiftPlan(p,mins,days){
 var CLOUD={user:null,ready:false,status:'off',err:'',lastOk:null,unsub:[],t:null,view:'',last:{plans:new Map(),notes:new Map(),meta:''}};
 const clean=o=>JSON.parse(JSON.stringify(o));
 const metaOf=()=>({name:state.name||'',folders:state.folders||[],links:(state.links||[]).map(l=>l[0]+'|'+l[1]),mode:state.mode||'light'});
-function applyMeta(m){state.name=m.name||'';state.folders=Array.isArray(m.folders)?m.folders:[];
-  state.links=(m.links||[]).map(x=>String(x).split('|')).filter(l=>l.length===2);if(m.mode&&m.mode!==state.mode){state.mode=m.mode;applyMode()}}
+function applyMeta(m){state.name=str(m.name,40);state.folders=cleanFolders(m.folders);
+  state.links=cleanLinks((Array.isArray(m.links)?m.links:[]).map(x=>String(x).split('|')));if((m.mode==='dark'||m.mode==='light')&&m.mode!==state.mode){state.mode=m.mode;applyMode()}}
 function errText(e){const c=(e&&e.code)||'';
   if(['auth/invalid-credential','auth/wrong-password','auth/user-not-found','auth/invalid-email','auth/invalid-login-credentials','auth/missing-password'].includes(c))return 'Väärä sähköposti tai salasana.';
   if(c==='auth/admin-restricted-operation')return 'Tätä tiliä ei ole lisätty. Pyydä ylläpitäjää lisäämään sinut.';
@@ -2073,7 +2104,7 @@ function startListeners(){
         if(ch.doc.metadata.hasPendingWrites)return;
         const id=ch.doc.id,i=arr.findIndex(x=>x.id===id);
         if(ch.type==='removed'){if(i>=0&&!(kind==='notes'&&isEditingNote(id))){arr.splice(i,1);changed=true}last.delete(id);return}
-        const data={...ch.doc.data(),id},js=JSON.stringify(clean(data));
+        const data=(kind==='plans'?cleanPlan:cleanNote)({...ch.doc.data(),id});if(!data||data.id!==id)return;const js=JSON.stringify(clean(data));
         if(i>=0&&JSON.stringify(clean(arr[i]))===js){last.set(id,js);return}
         if(kind==='notes'&&isEditingNote(id))return;      // don't overwrite what you're typing
         last.set(id,js);if(i>=0)arr[i]=data;else arr.push(data);changed=true;
@@ -2101,7 +2132,7 @@ async function onSignedIn(user){
       // account already has data: load it (this device's signed-out data is kept as a local backup)
       if(state.account!==uid){try{localStorage.setItem('kalenteri.guestBackup',JSON.stringify(state))}catch(e){}}
       const [ps,ns]=await Promise.all([getDocs(collection(db,'users',uid,'plans')),getDocs(collection(db,'users',uid,'notes'))]);
-      state.plans=ps.docs.map(d=>({...d.data(),id:d.id}));state.notes=ns.docs.map(d=>({...d.data(),id:d.id}));
+      state.plans=ps.docs.map(d=>cleanPlan({...d.data(),id:d.id})).filter(Boolean);state.notes=ns.docs.map(d=>cleanNote({...d.data(),id:d.id})).filter(Boolean);
       applyMeta(metaSnap.data());
       CLOUD.last.plans=new Map(state.plans.map(x=>[x.id,JSON.stringify(clean(x))]));
       CLOUD.last.notes=new Map(state.notes.map(x=>[x.id,JSON.stringify(clean(x))]));
@@ -2208,8 +2239,8 @@ $('importFile').onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
   try{const d=JSON.parse(await f.text());if(!Array.isArray(d.plans))throw 0;
     const ids=new Set(state.plans.map(p=>p.id));let n=0;
-    for(const p of d.plans)if(p&&p.date&&!ids.has(p.id)){state.plans.push(p);n++}
-    if(d.name&&!state.name)state.name=d.name;
+    for(const raw of d.plans){const p=cleanPlan(raw);if(p&&!ids.has(p.id)){state.plans.push(p);ids.add(p.id);n++}}
+    if(d.name&&!state.name)state.name=str(d.name,40);
     save();refresh();toast(`Tuotu ${n} suunnitelmaa`);
   }catch(err){toast('Tiedostoa ei voitu lukea')}
   e.target.value='';
