@@ -1,6 +1,6 @@
 // Bump VERSION whenever you deploy changes so phones pick up the new files.
-const VERSION = 'kalenteri-v0.14';
-const FILES = ['./', './index.html', './manifest.json', './icons/apple-touch-icon.png', './icons/icon-192.png', './icons/icon-512.png'];
+const VERSION = 'kalenteri-v0.16';
+const FILES = ['./', './index.html', './boot.js', './app.js', './fb.js', './manifest.json', './icons/apple-touch-icon.png', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
