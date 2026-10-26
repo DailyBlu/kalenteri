@@ -711,7 +711,7 @@ textarea{width:100%;border:0;outline:0;resize:none;font-size:16px;min-height:110
     <p class="hint" id="storeHint">Suunnitelmat tallennetaan vain tähän laitteeseen. Ota varmuuskopio silloin tällöin.</p>
     <div class="group-label" id="installLabel">Asenna iPhoneen</div>
     <p class="hint" id="installHint">Avaa tämä sivu Safarissa → paina <b>Jaa</b>-painiketta → <b>Lisää Koti-valikkoon</b>. Sovellus aukeaa silloin koko näytölle omasta kuvakkeestaan.</p>
-    <p class="hint" style="margin-top:24px">Versio 0.15</p>
+    <p class="hint" style="margin-top:24px">Versio 0.14</p>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
     <div class="home-pad"></div>
   </div>
@@ -2059,10 +2059,6 @@ function errText(e){const c=(e&&e.code)||'';
   if(c==='auth/too-many-requests')return 'Liian monta yritystä. Yritä hetken päästä uudelleen.';
   if(c==='auth/unauthorized-domain')return 'Tätä osoitetta ei ole sallittu Firebasen asetuksissa.';
   if(c==='permission-denied')return 'Tiliäsi ei ole lisätty sallittujen listalle.';
-  if(c==='auth/weak-password')return 'Salasanan pitää olla vähintään 6 merkkiä.';
-  if(c==='auth/requires-recent-login')return 'Kirjaudu ulos ja uudelleen sisään Googlella, ja lisää salasana heti sen jälkeen.';
-  if(c==='auth/provider-already-linked')return 'Tilillä on jo salasana.';
-  if(c==='auth/credential-already-in-use'||c==='auth/email-already-in-use')return 'Tällä sähköpostilla on jo erillinen salasanatili. Poista se Firebase-konsolista ja yritä uudelleen.';
   return (e&&e.message)||'Tuntematon virhe.';}
 function setSync(st,err){CLOUD.status=st;if(err!=null)CLOUD.err=err;if(st==='ok')CLOUD.lastOk=new Date();renderAccount()}
 function scheduleSync(){if(!CLOUD||!CLOUD.ready)return;clearTimeout(CLOUD.t);CLOUD.t=setTimeout(pushSync,900)}
@@ -2172,9 +2168,8 @@ function renderAccount(){
     const html=`<div class="acct-user"><span class="acct-av">${esc((u.email||'?')[0].toUpperCase())}</span><div style="min-width:0">
         <b>${esc(u.email||'')}</b><div class="acct-st ${off?'saving':st}"><i></i><span>${esc(txt)}</span></div></div></div>
       <p>Muutokset tallentuvat automaattisesti ja näkyvät kaikilla laitteilla, joilla olet kirjautuneena.</p>
-      ${pwBlock(u)}
       <button class="acct-out" id="acctOut">Kirjaudu ulos</button>`;
-    box.innerHTML=html;CLOUD.view='in';bindPw(u);
+    box.innerHTML=html;CLOUD.view='in';
     $('acctOut').onclick=()=>{$('acctOut').disabled=true;$('acctOut').textContent='Kirjaudutaan ulos…';doSignOut()};
     return;
   }
@@ -2206,33 +2201,6 @@ function renderAccount(){
     try{await FB.sendPasswordResetEmail(FB.auth,em);err('');toast('Salasanan palautuslinkki lähetetty, jos tili on olemassa')}catch(e){err(errText(e))}
   };
 }
-
-/* sign-in methods + "add a password" for accounts created with Google */
-const providersOf=u=>((u&&u.providerData)||[]).map(x=>x.providerId);
-function pwBlock(u){
-  const pr=providersOf(u),hasPw=pr.includes('password'),hasG=pr.includes('google.com');
-  const names=[hasG?'Google':null,hasPw?'sähköposti + salasana':null].filter(Boolean).join(' ja ')||'—';
-  return `<p><b>Kirjautumistavat:</b> ${esc(names)}</p>`+(hasPw?'':`
-    <input type="password" id="pwNew" placeholder="Uusi salasana (väh. 6 merkkiä)" autocomplete="new-password">
-    <input type="password" id="pwNew2" placeholder="Salasana uudelleen" autocomplete="new-password">
-    <button class="acct-btn primary" id="pwAdd">Lisää salasana</button>
-    <div class="acct-err" id="pwErr"></div>`);
-}
-function bindPw(u){
-  const b=$('pwAdd');if(!b)return;
-  b.onclick=async()=>{
-    const a=$('pwNew').value,c=$('pwNew2').value,err=m=>{$('pwErr').textContent=m};
-    if(a.length<6){err('Salasanan pitää olla vähintään 6 merkkiä.');return}
-    if(a!==c){err('Salasanat eivät täsmää.');return}
-    b.disabled=true;b.textContent='Lisätään…';err('');
-    try{
-      const cur=FB.auth.currentUser||u;
-      const res=await FB.linkWithCredential(cur,FB.EmailAuthProvider.credential(cur.email,a));
-      CLOUD.user=res.user||cur;toast('Salasana lisätty – voit nyt kirjautua myös sähköpostilla');renderAccount();
-    }catch(e){err(errText(e));b.disabled=false;b.textContent='Lisää salasana'}
-  };
-}
-
 function fbInit(){
   renderAccount();
   FB.onAuthStateChanged(FB.auth,u=>{
@@ -2335,7 +2303,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.
 <script type="module">
 // Firebase: loaded separately so the app still works offline or if this fails to load.
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail,linkWithCredential,EmailAuthProvider} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,memoryLocalCache,collection,doc,onSnapshot,writeBatch,getDoc,getDocs,terminate,clearIndexedDbPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 const firebaseConfig={
   apiKey:"AIzaSyC0G0ie-T2FtV2EBZLUx7XiHefGVfh9kLU",
@@ -2350,7 +2318,7 @@ const auth=getAuth(app);auth.languageCode='fi';
 let db;
 try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}
 catch(e){db=initializeFirestore(app,{localCache:memoryLocalCache()})}
-window.FB={auth,db,onAuthStateChanged,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail,linkWithCredential,EmailAuthProvider,
+window.FB={auth,db,onAuthStateChanged,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,sendPasswordResetEmail,
   collection,doc,onSnapshot,writeBatch,getDoc,getDocs,terminate,clearIndexedDbPersistence};
 window.dispatchEvent(new Event('fb-ready'));
 </script>
